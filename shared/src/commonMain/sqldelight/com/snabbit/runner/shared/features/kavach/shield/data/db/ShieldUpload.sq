@@ -1,0 +1,58 @@
+-- Step 7 upload outbox — 1:1 with the Flutter `snabbit_shield_uploads` table.
+-- Audio is stored as an in-row BLOB (not a file path); all encryption fields live inside
+-- `encryption_metadata_json`. Timestamps are epoch MILLISECONDS.
+
+CREATE TABLE shieldUpload (
+    id                        INTEGER PRIMARY KEY AUTOINCREMENT,
+    booking_id                INTEGER NOT NULL,
+    timestamp                 INTEGER NOT NULL,
+    encrypted_audio_bytes     BLOB    NOT NULL,
+    encryption_metadata_json  TEXT    NOT NULL,
+    duration_seconds          INTEGER NOT NULL,
+    is_sos                    INTEGER NOT NULL DEFAULT 0,
+    created_at                INTEGER NOT NULL,
+    retry_count               INTEGER NOT NULL DEFAULT 0,
+    next_attempt_at           INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX idx_shield_created ON shieldUpload(created_at);
+CREATE INDEX idx_shield_next_attempt ON shieldUpload(next_attempt_at);
+
+insert:
+INSERT INTO shieldUpload(booking_id, timestamp, encrypted_audio_bytes, encryption_metadata_json, duration_seconds, is_sos, created_at)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+-- Dequeue: oldest-first, only rows past their backoff gate. No LIMIT (matches Flutter).
+selectEligible:
+SELECT * FROM shieldUpload WHERE next_attempt_at <= :now ORDER BY created_at ASC;
+
+-- Same eligibility as selectEligible but WITHOUT the audio BLOB — the drain iterates metadata rows and
+-- loads each clip's bytes lazily (selectBytesById) only when it's about to upload, so a full backlog of
+-- multi-hundred-KB clips isn't materialized into the heap at once.
+selectEligibleMeta:
+SELECT id, booking_id, timestamp, encryption_metadata_json, duration_seconds, is_sos, created_at, retry_count, next_attempt_at
+FROM shieldUpload WHERE next_attempt_at <= :now ORDER BY created_at ASC;
+
+selectBytesById:
+SELECT encrypted_audio_bytes FROM shieldUpload WHERE id = :id;
+
+deleteById:
+DELETE FROM shieldUpload WHERE id = :id;
+
+reschedule:
+UPDATE shieldUpload SET retry_count = :retryCount, next_attempt_at = :nextAttemptAt WHERE id = :id;
+
+-- TTL eviction (created_at older than cutoff).
+deleteExpired:
+DELETE FROM shieldUpload WHERE created_at < :cutoff;
+
+-- Cap enforcement: ids ordered so SOS + newest survive; caller keeps the first N, deletes the rest.
+selectIdsByPriority:
+SELECT id FROM shieldUpload ORDER BY is_sos DESC, created_at DESC;
+
+count:
+SELECT count(*) FROM shieldUpload;
+
+-- Clear-all on 401 / logout (prevents cross-user data leakage).
+deleteAll:
+DELETE FROM shieldUpload;

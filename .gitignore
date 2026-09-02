@@ -1,0 +1,90 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Gradle (project-level cache / machine-local metadata — never source)
+.gradle/
+# Gradle build outputs in any module (android/, shared/, nested) — never source
+**/build/
+
+# Kotlin Multiplatform incremental compilation cache (build artifact)
+.kotlin/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+**/build/
+pubspec_overrides.yaml
+local.properties
+/windows/
+/linux/
+/macos/
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+/.fvm/
+
+# FVM Version Cache
+.fvm/
+devtools
+.vscode/
+devtools_options.yaml
+.cursor/
+
+# Claude Code worktrees (agent sessions) — never tracked as embedded repos
+.claude/worktrees/
+
+# Production CI/release automation is intentionally excluded from this
+# frontend-only design-lab repository.
+.github/workflows/
+
+# Dummy model files
+lib/referrals/models/__dummy_model.dart
+android/app/.cxx/
+windows/flutter/generated_plugins.cmake
+coverage/
+*.lcov
+linux/
+windows/
+macos/
+android/.kotlin/
+
+# Local AWOL verification artifact (Figma vs implemented comparison screenshot)
+figma_left_vs_implemented_right.png
+
+# KMP :shared module local SDK config — machine-specific, never track
+shared/local.properties

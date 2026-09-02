@@ -1,0 +1,9 @@
+{
+  "event": "navigate",
+  "requestId": "01J9Z3NAV8Q0000000000000V3",
+  "error": {
+    "code": "UNKNOWN_ROUTE",
+    "message": "No route registered for snabbit://this-does-not-exist",
+    "details": {"uri": "snabbit://this-does-not-exist"}
+  }
+}

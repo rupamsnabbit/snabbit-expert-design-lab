@@ -1,0 +1,7 @@
+{
+  "event": "requestInitData",
+  "data": {
+    "capabilities": ["navigate", "trackEvent", "tokenExpired"]
+  },
+  "requestId": "01J9Z2P8K9VXRY4QC3H6B1M7W2"
+}

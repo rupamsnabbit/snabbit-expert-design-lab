@@ -1,0 +1,7 @@
+{
+  "event": "permissionRequest",
+  "data": {
+    "permission": "bluetooth"
+  },
+  "requestId": "01JA0000PERM00000000000002"
+}

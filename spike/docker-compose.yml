@@ -1,0 +1,13 @@
+# WS0 soak-spike broker. EMQX 5.8 (>= 5.7 for parity with the backend's
+# disconnect_after_expire behaviour). Defaults: anonymous auth allowed,
+# retainer ON — matching what the spike needs; production auth (JWT) is
+# exercised later against staging (WS9).
+# Dashboard: http://localhost:18083 (admin / public on first run).
+services:
+  emqx:
+    image: emqx/emqx:5.8.7
+    container_name: mqtt-spike-emqx
+    ports:
+      - "1883:1883"     # mqtt (spike uses plaintext locally; TLS is a WS9/staging concern)
+      - "8883:8883"
+      - "18083:18083"   # dashboard

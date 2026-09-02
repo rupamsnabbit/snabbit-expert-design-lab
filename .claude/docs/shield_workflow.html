@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snabbit Kavach — Safety Shield Workflow</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;font-size:13px}
+:root{
+  --flutter:#3b82f6;--flutter-bg:#1e3a5f;--flutter-light:#eff6ff;
+  --native:#10b981;--native-bg:#064e3b;--native-light:#ecfdf5;
+  --api:#f59e0b;--api-bg:#451a03;--api-light:#fffbeb;
+  --bridge:#a855f7;--bridge-bg:#3b0764;--bridge-light:#faf5ff;
+  --sos:#ef4444;--sos-bg:#450a0a;--sos-light:#fff1f2;
+  --event:#8b5cf6;--gate:#64748b;--ok:#22c55e;
+}
+
+/* ── Layout ── */
+#app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.hdr{background:linear-gradient(135deg,#1e3a8a,#0369a1);padding:14px 24px;display:flex;align-items:center;gap:16px;flex-shrink:0}
+.hdr h1{font-size:17px;font-weight:700;color:#fff}
+.hdr span{font-size:11px;color:#93c5fd;background:rgba(255,255,255,.1);padding:2px 8px;border-radius:12px}
+.tabs{display:flex;background:#1e293b;border-bottom:1px solid #334155;flex-shrink:0;padding:0 16px;gap:2px}
+.tab{background:none;border:none;padding:10px 16px;color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab.active{color:#60a5fa;border-bottom-color:#3b82f6}
+.tab:hover:not(.active){color:#cbd5e1}
+.main{display:flex;flex:1;overflow:hidden}
+.flow-area{flex:1;overflow:auto;padding:20px}
+.detail{width:360px;flex-shrink:0;background:#1e293b;border-left:1px solid #334155;overflow:auto;display:none;flex-direction:column}
+.detail.open{display:flex}
+.detail-hdr{padding:14px 16px;background:#0f172a;border-bottom:1px solid #334155;display:flex;justify-content:space-between;align-items:center}
+.detail-hdr h3{font-size:13px;font-weight:700;color:#f1f5f9}
+.close-btn{background:none;border:none;color:#64748b;cursor:pointer;font-size:16px;padding:2px 6px}
+.close-btn:hover{color:#f1f5f9}
+.detail-body{padding:16px;flex:1;overflow:auto}
+.detail-section{margin-bottom:14px}
+.detail-section h4{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#64748b;margin-bottom:6px}
+.detail-section p,.detail-section li{font-size:11px;color:#cbd5e1;line-height:1.5}
+.detail-section ul{padding-left:14px}
+.detail-section pre{font-size:10px;background:#0f172a;border:1px solid #334155;border-radius:6px;padding:10px;overflow-x:auto;color:#86efac;line-height:1.5}
+.detail-badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;margin:2px}
+
+/* ── Nodes ── */
+.node{display:inline-flex;flex-direction:column;gap:2px;padding:8px 11px;border-radius:8px;border:1.5px solid;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;min-width:110px;text-align:center;vertical-align:top;position:relative}
+.node:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.node sub{font-size:9px;font-weight:400;opacity:.7;display:block}
+.node.flutter{background:var(--flutter-bg);border-color:var(--flutter);color:#93c5fd}
+.node.native{background:var(--native-bg);border-color:var(--native);color:#6ee7b7}
+.node.api{background:var(--api-bg);border-color:var(--api);color:#fcd34d}
+.node.bridge{background:var(--bridge-bg);border-color:var(--bridge);color:#c4b5fd}
+.node.sos{background:var(--sos-bg);border-color:var(--sos);color:#fca5a5}
+.node.gate{background:#1e293b;border-color:#475569;color:#94a3b8}
+.node.ok{background:#052e16;border-color:#22c55e;color:#86efac}
+
+/* ── Await badge ── */
+.await-badge{display:inline-block;background:#451a03;color:#fcd34d;border:1px solid #f59e0b;border-radius:3px;font-size:8px;font-weight:800;padding:1px 4px;margin-bottom:3px}
+.ch-badge{display:inline-block;background:#3b0764;color:#c4b5fd;border:1px solid #a855f7;border-radius:3px;font-size:8px;font-weight:800;padding:1px 4px;margin-bottom:3px}
+
+/* ── Flow helpers ── */
+.row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.col{display:flex;flex-direction:column;align-items:center;gap:4px}
+.arr{color:#475569;font-size:14px;flex-shrink:0}
+.arr-d{display:block;text-align:center;color:#475569;font-size:14px;margin:3px auto}
+.section{margin-bottom:24px}
+.section h3{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #1e293b}
+.label{font-size:10px;color:#64748b;text-align:center;margin-top:2px;max-width:110px}
+.divider{display:flex;align-items:center;gap:8px;margin:12px 0}
+.divider-line{flex:1;height:1px;background:#1e293b}
+.divider-text{font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
+.lane{border-radius:10px;border:1px solid #1e293b;overflow:hidden;margin-bottom:16px}
+.lane-header{padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.lane-body{padding:14px;background:#0f172a}
+.bridge-bar{background:var(--bridge-bg);border:1.5px dashed #a855f7;border-radius:8px;padding:8px 14px;margin:8px 0;display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:#c4b5fd}
+.note{background:#1e293b;border:1px solid #334155;border-radius:6px;padding:8px 12px;font-size:10px;color:#94a3b8;margin:6px 0}
+
+/* ── Gate chain ── */
+.gate-chain{display:flex;align-items:center;flex-wrap:wrap;gap:4px;background:#0f172a;border-radius:10px;padding:12px 14px;border:1px solid #1e293b}
+.g{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;border-radius:6px;background:#1e293b;border:1.5px solid #475569;font-size:10px;font-weight:600;color:#94a3b8;cursor:pointer;min-width:70px;text-align:center}
+.g:hover{border-color:#60a5fa;color:#93c5fd}
+.g .gl{font-size:9px;font-weight:400;color:#64748b;margin-top:1px}
+.g-sep{color:#334155;font-size:11px}
+
+/* ── Tab visibility ── */
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* ── API cards ── */
+.api-card{background:#0f172a;border:1.5px solid #334155;border-radius:10px;margin-bottom:14px;overflow:hidden}
+.api-card-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #1e293b;cursor:pointer}
+.api-card-hdr:hover{background:#1e293b}
+.method-badge{padding:3px 8px;border-radius:4px;font-size:10px;font-weight:800;flex-shrink:0}
+.method-GET{background:#064e3b;color:#6ee7b7}
+.method-POST{background:#1e3a5f;color:#93c5fd}
+.method-PUT{background:#451a03;color:#fcd34d}
+.api-url{font-family:monospace;font-size:11px;color:#f1f5f9;flex:1}
+.api-body{padding:12px 14px;display:none}
+.api-body.open{display:block}
+.api-body pre{background:#070d1a;border:1px solid #1e293b;border-radius:6px;padding:10px;font-size:10px;color:#86efac;overflow-x:auto;line-height:1.6}
+.api-body p{font-size:11px;color:#94a3b8;margin-bottom:6px}
+
+/* ── Bridge table ── */
+.btable{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:16px}
+.btable th{background:#1e293b;color:#94a3b8;padding:7px 10px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid #334155}
+.btable td{padding:7px 10px;border-bottom:1px solid #1e293b;vertical-align:top;color:#cbd5e1}
+.btable tr:hover td{background:#1e293b}
+.mono{font-family:monospace;font-size:10px;color:#c4b5fd}
+.mono-g{font-family:monospace;font-size:10px;color:#6ee7b7}
+.mono-a{font-family:monospace;font-size:10px;color:#fcd34d}
+
+/* ── Analytics table ── */
+.atable{width:100%;border-collapse:collapse;font-size:11px}
+.atable th{background:#1e293b;color:#94a3b8;padding:7px 10px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid #334155}
+.atable td{padding:6px 10px;border-bottom:1px solid #1e293b;vertical-align:top}
+.atable tr:hover td{background:#1e293b}
+.ev{font-family:monospace;font-size:10px;color:#c4b5fd;background:#1e1030;padding:2px 5px;border-radius:3px}
+.plane-cx{font-size:9px;padding:1px 4px;border-radius:3px;background:#064e3b;color:#6ee7b7;font-weight:700}
+.plane-mp{font-size:9px;padding:1px 4px;border-radius:3px;background:#1e3a5f;color:#93c5fd;font-weight:700}
+.plane-ct{font-size:9px;padding:1px 4px;border-radius:3px;background:#3b0764;color:#c4b5fd;font-weight:700}
+.planes{display:flex;gap:3px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- Header -->
+<div class="hdr">
+  <div>
+    <h1>Snabbit Kavach — Safety Shield</h1>
+  </div>
+  <span>Complete Integration Workflow</span>
+  <span style="margin-left:auto;font-size:10px;opacity:.6">feat/shield-ml-signal-validation</span>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('sos')">SOS Paths</button>
+  <button class="tab" onclick="showTab('lifecycle')">Shield Lifecycle</button>
+  <button class="tab" onclick="showTab('api')">API Calls</button>
+  <button class="tab" onclick="showTab('bridge')">Channel Bridge</button>
+  <button class="tab" onclick="showTab('analytics')">Analytics (50+ events)</button>
+</div>
+
+<div class="main">
+<div class="flow-area">
+
+<!-- ═══════════ TAB: SOS PATHS ═══════════ -->
+<div id="tab-sos" class="tab-content active">
+
+<div class="section">
+  <h3>SOS Trigger Entry Points</h3>
+  <div class="row" style="flex-wrap:wrap;gap:8px;align-items:flex-start">
+
+    <div class="col">
+      <div class="node native" onclick="showDetail('ml')">
+        ML Detection<sub>DetectionService.kt</sub>
+      </div>
+      <div class="label">PCM→VAD+YAMNet<br>3-gate AND logic</div>
+    </div>
+
+    <div class="col">
+      <div class="node native" onclick="showDetail('accel')">
+        Shake Detect<sub>AccelerometerService.kt</sub>
+      </div>
+      <div class="label">≥3 reversals in<br>window (5s, 1.5G)</div>
+    </div>
+
+    <div class="col">
+      <div class="node native" onclick="showDetail('vol')">
+        Volume Button<sub>VolumeButtonService.kt</sub>
+      </div>
+      <div class="label">N presses in<br>window (RC config)</div>
+    </div>
+
+    <div class="col">
+      <div class="node flutter" onclick="showDetail('manual')">
+        Manual SOS UI<sub>sos.dart / SOS slider</sub>
+      </div>
+      <div class="label">Runner slides SOS<br>or taps SOS button</div>
+    </div>
+
+    <div class="col">
+      <div class="node flutter" onclick="showDetail('fcm')">
+        FCM Push<sub>safety_shield_adapter.dart</sub>
+      </div>
+      <div class="label">Backend triggers SOS<br>via push notification</div>
+    </div>
+
+    <div class="col">
+      <div class="node native" onclick="showDetail('power')">
+        Power Button<sub>iOS only · C-06 pending</sub>
+      </div>
+      <div class="label">willResignActive<br>approximation</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Native triggers converge -->
+<div class="divider"><div class="divider-line"></div><div class="divider-text">Native triggers → StateMachine.triggerSoS(source)</div><div class="divider-line"></div></div>
+
+<div class="section">
+  <div class="row">
+    <div class="node native" onclick="showDetail('statemachine')">
+      StateMachine<sub>IDLE → SOS_PENDING</sub>
+    </div>
+    <span class="arr">→</span>
+    <div class="node native" onclick="showDetail('notifylistener')">
+      notifyListener{ }<sub>SafetyMonitoringService</sub>
+    </div>
+    <span class="arr">→</span>
+    <div class="bridge-bar" style="display:inline-flex;padding:6px 12px;border-radius:8px">
+      <span>⚡</span> EventChannel <span class="mono">/sos_triggered</span>
+      <span style="font-size:10px;opacity:.7;margin-left:6px">{source, triggerType}</span>
+    </div>
+    <span class="arr">→</span>
+    <div class="node flutter" onclick="showDetail('handlesos')">
+      ShieldEventHandler<sub>._handleSoSTriggered()</sub>
+    </div>
+  </div>
+
+  <div class="arr-d">↓</div>
+
+  <!-- SOS Initiate API -->
+  <div class="row">
+    <div class="node api" onclick="showDetail('api-initiate')">
+      <span class="await-badge">await</span>
+      POST /sos/initiate<sub>RunnerHttp.runnerSOSInitiate</sub>
+    </div>
+    <span class="arr">→</span>
+    <div class="node flutter" style="font-size:10px">
+      Request: {source, trigger_type, job_id?}<sub>Response: {sos_id}</sub>
+    </div>
+  </div>
+  <div class="note">On failure → <span class="ev">expert_shield_sos_initiate_failed</span> fired, flow aborted</div>
+
+  <div class="arr-d">↓ on 200 success</div>
+
+  <!-- App state fork -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px">
+
+    <div class="lane">
+      <div class="lane-header" style="background:#1e3a5f;color:#93c5fd">📱 App Foreground</div>
+      <div class="lane-body">
+        <div class="col" style="align-items:flex-start;gap:6px">
+          <div class="node native" style="font-size:10px" onclick="showDetail('notif-sos')">
+            Show SOS Notification<sub>NotificationService — ID 1002</sub>
+          </div>
+          <span class="arr-d" style="margin-left:55px">+</span>
+          <div class="node flutter" style="font-size:10px" onclick="showDetail('alertsheet')">
+            ShieldAlertBottomSheet.show()<sub>20s auto-deny timer (RC: shieldSosAlertDisplaySecs)</sub>
+          </div>
+          <div class="note" style="font-size:10px;margin-top:4px">
+            <b>Primary btn</b>: "NEED HELP" → <span class="ev">sos_alert_confirm_click</span><br>
+            <b>Secondary btn</b>: "I'M SAFE" → <span class="ev">sos_alert_deny_click</span><br>
+            <b>Swipe dismiss</b>: whenComplete → _isShowing=false
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lane">
+      <div class="lane-header" style="background:#1e293b;color:#94a3b8">🔒 Background / Lock Screen</div>
+      <div class="lane-body">
+        <div class="col" style="align-items:flex-start;gap:6px">
+          <div class="node native" style="font-size:10px" onclick="showDetail('notif-alert')">
+            Show SOS Alert Notification<sub>ID 1002 · with action buttons</sub>
+          </div>
+          <div class="arr-d" style="margin-left:55px">↓</div>
+          <div class="note" style="font-size:10px">
+            Runner taps notification action button:
+          </div>
+          <div class="node native" style="font-size:10px" onclick="showDetail('notif-receiver')">
+            NotificationActionReceiver<sub>ACTION_CONFIRM_SOS / ACTION_DENY_SOS</sub>
+          </div>
+          <div class="arr-d" style="margin-left:55px">↓</div>
+          <div class="node native" style="font-size:10px">
+            stateMachine.confirmSoS()<sub>SOS_PENDING → SOS_CONFIRMED</sub>
+          </div>
+          <div class="arr-d" style="margin-left:55px">↓</div>
+          <div class="bridge-bar" style="font-size:10px;padding:5px 8px">
+            ⚡ EventChannel <span class="mono">/notification_action</span>
+            <span style="opacity:.7">{action, source, ts}</span>
+          </div>
+          <div class="arr-d" style="margin-left:55px">↓</div>
+          <div class="node flutter" style="font-size:10px" onclick="showDetail('notif-confirm')">
+            _handleNotificationConfirm()<sub>SosFlowCoordinator — context: null</sub>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Both paths converge to _executeSosConfirm -->
+  <div class="divider"><div class="divider-line"></div><div class="divider-text">Both paths → _executeSosConfirm(callApi: true)</div><div class="divider-line"></div></div>
+
+  <div class="row">
+    <div class="node api" onclick="showDetail('api-confirm')">
+      <span class="await-badge">await</span>
+      POST /sos<sub>user_action: "confirm"</sub>
+    </div>
+    <span class="arr">→</span>
+    <div class="node flutter" style="font-size:10px">Response: {ph_no?}<sub>phone for SOSActiveScreen</sub></div>
+    <span class="arr">→</span>
+    <div class="node flutter" onclick="showDetail('complete-confirm')">
+      _completeSosConfirm()<sub>SosFlowCoordinator</sub>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:8px">
+    <div class="node bridge" onclick="showDetail('mc-confirm')">
+      <span class="ch-badge">MethodChannel</span>
+      _shield.confirmSoS()<sub>Native: SOS_CONFIRMED state</sub>
+    </div>
+    <span class="arr">+</span>
+    <div class="node flutter">
+      start deterrence<sub>_deterrence.play() after RC delay</sub>
+    </div>
+    <span class="arr">+</span>
+    <div class="node ok" onclick="showDetail('sos-active')">
+      SOSActiveScreen<sub>Navigator.push(context)</sub>
+    </div>
+  </div>
+</div>
+
+<!-- Sync recovery -->
+<div class="divider"><div class="divider-line"></div><div class="divider-text">Sync Recovery Path (on resume / job start)</div><div class="divider-line"></div></div>
+
+<div class="section">
+  <div class="row">
+    <div class="node flutter" onclick="showDetail('sync')">
+      <span class="await-badge">await</span>
+      syncActiveSosState()<sub>SosFlowCoordinator</sub>
+    </div>
+    <span class="arr">→</span>
+    <div class="node api" onclick="showDetail('api-active')">
+      <span class="await-badge">await</span>
+      GET /sos/active<sub>Response: {has_active_sos, sos?}</sub>
+    </div>
+  </div>
+  <div class="row" style="margin-top:8px;flex-wrap:wrap;gap:16px">
+    <div class="col">
+      <div class="node flutter" style="font-size:10px;background:#064e3b;border-color:#22c55e;color:#86efac">status = "initiated"</div>
+      <div class="arr-d">↓</div>
+      <div class="node flutter" style="font-size:10px" onclick="showDetail('sync-initiated')">_handleSyncInitiated()<br><sub>if !isSOSMode: show alert sheet</sub></div>
+      <div class="label">Guard: if(isSOSMode) return<br>prevents re-show after confirm</div>
+    </div>
+    <div class="col">
+      <div class="node flutter" style="font-size:10px;background:#064e3b;border-color:#22c55e;color:#86efac">status = "pending"</div>
+      <div class="arr-d">↓</div>
+      <div class="node flutter" style="font-size:10px" onclick="showDetail('sync-confirmed')">_handleSyncConfirmed()<br><sub>→ _completeSosConfirm(fromSync:true)</sub></div>
+    </div>
+    <div class="col">
+      <div class="node gate" style="font-size:10px">has_active_sos = false<br>+ isSOSMode = true</div>
+      <div class="arr-d">↓</div>
+      <div class="node gate" style="font-size:10px">_handleSyncDenied()<br><sub>state desync → expertShieldSosStateDesync</sub></div>
+    </div>
+    <div class="col">
+      <div class="node gate" style="font-size:10px">no active SOS</div>
+      <div class="arr-d">↓</div>
+      <div class="node gate" style="font-size:10px">no-op</div>
+    </div>
+  </div>
+</div>
+
+<!-- Resolution -->
+<div class="divider"><div class="divider-line"></div><div class="divider-text">SOS Resolution Paths</div><div class="divider-line"></div></div>
+<div class="section">
+  <div class="row" style="flex-wrap:wrap;gap:8px;align-items:flex-start">
+    <div class="col">
+      <div class="node ok" style="font-size:10px">De-escalate<sub>Runner confirms safe</sub></div>
+      <div class="arr-d">↓</div>
+      <div class="node api" onclick="showDetail('api-deesc')"><span class="await-badge">await</span>POST /sos<br><sub>user_action: "dismiss"</sub></div>
+      <div class="arr-d">↓</div>
+      <div class="node bridge"><span class="ch-badge">MC</span> deescalateSoS()<sub>CONFIRMED→MONITORING</sub></div>
+    </div>
+    <div class="col">
+      <div class="node sos" style="font-size:10px">Deny (foreground)<sub>Sheet deny tap</sub></div>
+      <div class="arr-d">↓</div>
+      <div class="node api" onclick="showDetail('api-deny')"><span class="await-badge">await</span>POST /sos<br><sub>user_action: "deny"</sub></div>
+      <div class="arr-d">↓</div>
+      <div class="node flutter">clearSosState()<br><sub>provider.setSOSMode(false)</sub></div>
+    </div>
+    <div class="col">
+      <div class="node sos" style="font-size:10px">Auto-deny timeout<sub>20s (RC config) no action</sub></div>
+      <div class="arr-d">↓</div>
+      <div class="node flutter" style="font-size:10px">whenComplete→ check<br><sub>_sosResolvedExternally ?</sub></div>
+      <div class="arr-d">↓</div>
+      <div class="note" style="font-size:10px">if not resolved externally<br>→ deny API called</div>
+    </div>
+    <div class="col">
+      <div class="node flutter" style="font-size:10px">False Alarm<sub>sos.dart onFalseAlarm</sub></div>
+      <div class="arr-d">↓</div>
+      <div class="node api" onclick="showDetail('api-deny')"><span class="await-badge">await</span>POST /sos<br><sub>user_action: "deny"</sub></div>
+      <div class="arr-d">↓</div>
+      <div class="node bridge"><span class="ch-badge">MC</span> denySoS()<sub>SOS_PENDING → prev state</sub></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end tab-sos -->
+
+<!-- ═══════════ TAB: LIFECYCLE ═══════════ -->
+<div id="tab-lifecycle" class="tab-content">
+
+<div class="section">
+  <h3>Entry Points</h3>
+  <div class="row" style="flex-wrap:wrap;gap:8px;align-items:flex-start">
+    <div class="col">
+      <div class="node flutter" onclick="showDetail('auto-start')">Auto-start<sub>onJobStartedAndAutoStart()</sub></div>
+      <div class="label">Job begins, auto-enabled</div>
+    </div>
+    <div class="col">
+      <div class="node flutter" onclick="showDetail('manual-start')">Manual Activate<sub>SnabbitShieldCard CTA tap</sub></div>
+      <div class="label">Runner taps "Activate"<br><span class="ev" style="font-size:9px">expertShieldBannerCta</span></div>
+    </div>
+    <div class="col">
+      <div class="node flutter" onclick="showDetail('resume-start')">App Resume<sub>onAppResumed()</sub></div>
+      <div class="label">Foreground restore<br>with active job</div>
+    </div>
+  </div>
+  <div class="arr-d">↓ all entry points call startShield(context, trigger: auto|manual)</div>
+</div>
+
+<div class="section">
+  <h3>Start Gate Chain — ShieldStartStopController.startShield()</h3>
+  <div class="note">Reentrance guard: _startShieldInProgress. All gates in order — first failure returns immediately and fires expertShieldError.</div>
+  <div class="gate-chain">
+    <div class="g" onclick="showDetail('g0')"><span>G0</span><span class="gl">Job ID ≠ null</span></div>
+    <span class="g-sep">→</span>
+    <div class="g" onclick="showDetail('g0b')"><span>G0b</span><span class="gl">State desync check</span></div>
+    <span class="g-sep">→</span>
+    <div class="g" onclick="showDetail('g0c')"><span>G0c</span><span class="gl">Plugin init</span></div>
+    <span class="g-sep">→</span>
+    <div class="g" onclick="showDetail('g0d')"><span>G0d</span><span class="gl">onJobStarted()</span></div>
+    <span class="g-sep">→</span>
+    <div class="g" onclick="showDetail('g1')"><span>G1</span><span class="gl">Consent</span></div>
+    <span class="g-sep">→</span>
+    <div class="g" onclick="showDetail('g2')"><span>G2</span><span class="gl">Battery</span></div>
+    <span class="g-sep">→</span>
+    <div class="g" onclick="showDetail('g3')"><span>G3</span><span class="gl">Storage</span></div>
+    <span class="g-sep">→</span>
+    <div class="g" onclick="showDetail('g5')"><span>G5</span><span class="gl">Encryptor</span></div>
+    <span class="g-sep">→</span>
+    <div class="g" onclick="showDetail('g6')"><span>G6</span><span class="gl">Upload Queue</span></div>
+    <span class="g-sep">→</span>
+    <div class="g" style="border-color:#22c55e;color:#86efac;background:#052e16"><span>▶</span><span class="gl">START</span></div>
+  </div>
+  <div class="arr-d">↓ all gates pass → _startRecordingAndMonitoring(trigger)</div>
+  <div class="row" style="margin-top:8px">
+    <div class="node bridge"><span class="ch-badge">MC</span> _shield.startRecording()<sub>if not already recording</sub></div>
+    <span class="arr">+</span>
+    <div class="node bridge"><span class="ch-badge">MC</span> _shield.startMonitoring()<sub>ML gated natively by RC flag</sub></div>
+    <span class="arr">→</span>
+    <div class="bridge-bar" style="display:inline-flex;padding:6px 12px;border-radius:8px">⚡ EventChannel <span class="mono">/recording_state</span> {state: "recording"}</div>
+    <span class="arr">→</span>
+    <div class="node flutter"><span class="ev" style="font-size:9px">expertShieldStarted</span><sub>only on first recording state</sub></div>
+  </div>
+  <div class="note" style="margin-top:8px">activeTrigger set ONLY on success via `var started = false` guard — stale trigger prevented on failed start.</div>
+</div>
+
+<div class="section">
+  <h3>Active Monitoring (Native Layer)</h3>
+  <div class="lane"><div class="lane-header" style="background:#064e3b;color:#6ee7b7">Kotlin — SafetyMonitoringService (Foreground Service)</div>
+  <div class="lane-body">
+    <div class="row" style="flex-wrap:wrap;gap:8px">
+      <div class="col">
+        <div class="node native" style="font-size:10px" onclick="showDetail('audio-cap')">AudioService<br><sub>AudioRecord 16kHz PCM</sub></div>
+        <div class="arr-d">↓ onPcmData</div>
+        <div class="node native" style="font-size:10px" onclick="showDetail('detection')">DetectionService<br><sub>VAD + YAMNet</sub></div>
+        <div class="arr-d">↓ onDistressDetected</div>
+        <div class="node sos" style="font-size:10px">triggerSoS("ml")</div>
+      </div>
+      <div class="arr" style="margin-top:40px">|</div>
+      <div class="col">
+        <div class="node native" style="font-size:10px" onclick="showDetail('accel')">AccelerometerService<br><sub>TYPE_ACCELEROMETER</sub></div>
+        <div class="arr-d">↓ onShakeDetected</div>
+        <div class="node sos" style="font-size:10px">triggerSoS("accelerometer")</div>
+      </div>
+      <div class="arr" style="margin-top:40px">|</div>
+      <div class="col">
+        <div class="node native" style="font-size:10px" onclick="showDetail('vol')">VolumeButtonService<br><sub>AccessibilityService</sub></div>
+        <div class="arr-d">↓ onSoSTriggered</div>
+        <div class="node sos" style="font-size:10px">triggerSoS("volumeButton")</div>
+      </div>
+      <div class="arr" style="margin-top:40px">|</div>
+      <div class="col">
+        <div class="node native" style="font-size:10px" onclick="showDetail('encrypt')">EncryptionService<br><sub>AES-256-GCM + Gzip</sub></div>
+        <div class="arr-d">↓ onEncryptedAudioReady</div>
+        <div class="bridge-bar" style="font-size:10px;padding:5px 8px">⚡ /encrypted_audio</div>
+        <div class="arr-d">↓</div>
+        <div class="node flutter" style="font-size:10px" onclick="showDetail('upload-flow')">ShieldUploadQueue<br><sub>SQLite → S3</sub></div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<div class="section">
+  <h3>Shield Stop Paths</h3>
+  <div class="row" style="flex-wrap:wrap;gap:8px;align-items:flex-start">
+    <div class="col">
+      <div class="node gate" onclick="showDetail('stop-job')">Job Ended<sub>onJobEnded()</sub></div>
+      <div class="label"><span class="ev" style="font-size:9px">expertShieldStopped<br>reason:job_ended</span></div>
+    </div>
+    <div class="col">
+      <div class="node gate">Manual Stop<sub>provider.stopShield()</sub></div>
+    </div>
+    <div class="col">
+      <div class="node sos" style="font-size:10px">Mic Revoked<sub>onAppResumed detects</sub></div>
+      <div class="label"><span class="ev" style="font-size:9px">expertShieldError<br>mic_permission_revoked</span></div>
+    </div>
+    <div class="col">
+      <div class="node sos" style="font-size:10px">PlatformException<sub>serviceNotRunning</sub></div>
+      <div class="label">Re-init + retry logic<br><span class="ev" style="font-size:9px">expertShieldError<br>reinit_failed</span></div>
+    </div>
+  </div>
+  <div class="arr-d">↓ all stop paths → stopShield()</div>
+  <div class="row">
+    <div class="node bridge"><span class="ch-badge">MC</span> stopMonitoring()</div>
+    <span class="arr">+</span>
+    <div class="node bridge"><span class="ch-badge">MC</span> stopRecording()</div>
+    <span class="arr">→</span>
+    <div class="node flutter">provider.reset()<sub>all state cleared</sub></div>
+  </div>
+  <div class="note">stopMonitoring + stopRecording run independently — failure in one doesn't skip the other. Expected codes serviceNotRunning/invalidState are debug-level only.</div>
+</div>
+
+</div><!-- end tab-lifecycle -->
+
+<!-- ═══════════ TAB: API CALLS ═══════════ -->
+<div id="tab-api" class="tab-content">
+
+<div class="section"><h3>All HTTP API Endpoints (Safety Shield)</h3>
+<div class="note">All calls via RunnerHttp (authenticated Dio). Headers include Bearer token. On exception → MonitoringServiceHelper.logError (Coralogix) + ShieldApiResult.failure returned.</div>
+
+<div class="api-card">
+  <div class="api-card-hdr" onclick="toggleApi(this)">
+    <span class="method-badge method-POST">POST</span>
+    <span class="api-url">api/v1/runners/me/sos/initiate</span>
+    <span style="color:#64748b;font-size:10px;margin-left:auto">RunnerHttp.runnerSOSInitiate · _initiateSosAndShowSheetInternal</span>
+    <span style="color:#64748b;margin-left:8px">▼</span>
+  </div>
+  <div class="api-body">
+    <p>Initiates an SOS incident. Called for ALL trigger types (ML, shake, volume, manual, FCM, sync).</p>
+    <p><b>Request Body:</b></p>
+    <pre>{
+  "source": "safety_shield" | "sos_slider" | ...,
+  "trigger_type": "ml" | "non_ml",
+  "job_id": 12345  // optional, included when job active
+}</pre>
+    <p><b>Response (200):</b></p>
+    <pre>{
+  "sos_id": 789   // used to track this SOS incident throughout lifecycle
+}</pre>
+    <p><b>On failure:</b> fires <span class="ev">expert_shield_sos_initiate_failed</span> {source, trigger_type, job_id} → both planes. Flow aborted.</p>
+  </div>
+</div>
+
+<div class="api-card">
+  <div class="api-card-hdr" onclick="toggleApi(this)">
+    <span class="method-badge method-POST">POST</span>
+    <span class="api-url">api/v1/runners/me/sos</span>
+    <span style="color:#64748b;font-size:10px;margin-left:auto">RunnerHttp.runnerSOS · confirm / deny / dismiss</span>
+    <span style="color:#64748b;margin-left:8px">▼</span>
+  </div>
+  <div class="api-body">
+    <p>Unified SOS action endpoint for confirm, deny, and deescalate (dismiss). Called with different user_action values.</p>
+    <p><b>Request Body (confirm):</b></p>
+    <pre>{
+  "sos_id": 789,        // from initiate response
+  "user_action": "confirm"
+}</pre>
+    <p><b>Response (confirm 200):</b></p>
+    <pre>{
+  "ph_no": "+91XXXXXXXXXX"  // support contact shown in SOSActiveScreen
+}</pre>
+    <p><b>Request Body (deny):</b></p>
+    <pre>{
+  "sos_id": 789,
+  "user_action": "deny"
+}</pre>
+    <p><b>Request Body (dismiss/deescalate):</b></p>
+    <pre>{
+  "sos_id": 789,
+  "user_action": "dismiss"
+}</pre>
+    <p><b>Also used by sos.dart SOSProvider.triggerSOS():</b> no sos_id field (legacy slider path).</p>
+    <p><b>On deny API failure:</b> fires <span class="ev">expert_shield_sos_deny_api_failed</span> {sos_id, source, action_type, error}</p>
+  </div>
+</div>
+
+<div class="api-card">
+  <div class="api-card-hdr" onclick="toggleApi(this)">
+    <span class="method-badge method-GET">GET</span>
+    <span class="api-url">api/v1/runners/me/sos/active</span>
+    <span style="color:#64748b;font-size:10px;margin-left:auto">RunnerHttp.runnerSOSActive · syncActiveSosState</span>
+    <span style="color:#64748b;margin-left:8px">▼</span>
+  </div>
+  <div class="api-body">
+    <p>Polls backend for current SOS state. Called on job start, app resume, and sync recovery path.</p>
+    <p><b>Request:</b> No body. Auth header only.</p>
+    <p><b>Response (200):</b></p>
+    <pre>{
+  "has_active_sos": true,
+  "sos": {
+    "status": "initiated" | "pending" | "resolved",
+    "sos_id": 789,
+    "ph_no": "+91XXXXXXXXXX"  // optional
+  }
+}</pre>
+    <p>Routing: "initiated" → _handleSyncInitiated (show alert sheet if not already in SOS mode); "pending" → _handleSyncConfirmed; local=SOS + backend=no SOS → _handleSyncDenied (state desync).</p>
+  </div>
+</div>
+
+<div class="api-card">
+  <div class="api-card-hdr" onclick="toggleApi(this)">
+    <span class="method-badge method-POST">POST</span>
+    <span class="api-url">api/v1/runners/me/safety-shield/consent</span>
+    <span style="color:#64748b;font-size:10px;margin-left:auto">ShieldHttp.activateSnabbitShield · ShieldConsentProvider</span>
+    <span style="color:#64748b;margin-left:8px">▼</span>
+  </div>
+  <div class="api-body">
+    <p>Records runner consent for shield data collection. Gate 1 of start chain.</p>
+    <p><b>Request Body:</b></p>
+    <pre>{
+  "consent": true,
+  "consent_version": "1.0"
+}</pre>
+    <p><b>Response (200):</b> success. userProfileProvider.consentGiven = true set locally.</p>
+    <p><b>On success:</b> fires <span class="ev">expert_shield_consent_given</span> → CleverTap + Mixpanel</p>
+  </div>
+</div>
+
+<div class="api-card">
+  <div class="api-card-hdr" onclick="toggleApi(this)">
+    <span class="method-badge method-GET">GET</span>
+    <span class="api-url">api/v1/audio/presigned-url</span>
+    <span style="color:#64748b;font-size:10px;margin-left:auto">ShieldHttp.getPresignedUrl · ShieldUploadQueue</span>
+    <span style="color:#64748b;margin-left:8px">▼</span>
+  </div>
+  <div class="api-body">
+    <p>Step 1 of 3-step upload flow. Returns pre-signed S3 URL for direct upload.</p>
+    <p><b>Query Params:</b></p>
+    <pre>job_id=12345&timestamp=1718000000&is_sos=true</pre>
+    <p><b>Response (200):</b></p>
+    <pre>{
+  "presigned_url": "https://s3.amazonaws.com/bucket/...",
+  "s3_key": "recordings/job_12345/clip_1718000000.enc",
+  "allowed_content_types": ["application/octet-stream"]
+}</pre>
+    <p><b>On 409 (duplicate):</b> row deleted from SQLite, considered done — no retry.</p>
+  </div>
+</div>
+
+<div class="api-card">
+  <div class="api-card-hdr" onclick="toggleApi(this)">
+    <span class="method-badge method-PUT">PUT</span>
+    <span class="api-url">{presigned_url} (S3 direct upload)</span>
+    <span style="color:#64748b;font-size:10px;margin-left:auto">ShieldHttp.uploadToS3 · ShieldUploadQueue step 2</span>
+    <span style="color:#64748b;margin-left:8px">▼</span>
+  </div>
+  <div class="api-body">
+    <p>Raw PUT to S3 presigned URL. NO auth headers (S3 rejects them).</p>
+    <p><b>Headers:</b></p>
+    <pre>Content-Type: application/octet-stream
+Content-Length: {bytes.length}</pre>
+    <p><b>Body:</b> Raw encrypted + gzip-compressed bytes (AES-256-GCM output)</p>
+    <p><b>Timeouts:</b> sendTimeout=2min, receiveTimeout=2min</p>
+    <p><b>Returns:</b> true if status 200. Any exception → _retryOrDrop.</p>
+  </div>
+</div>
+
+<div class="api-card">
+  <div class="api-card-hdr" onclick="toggleApi(this)">
+    <span class="method-badge method-POST">POST</span>
+    <span class="api-url">api/v1/audio/upload-complete</span>
+    <span style="color:#64748b;font-size:10px;margin-left:auto">ShieldHttp.confirmUpload · ShieldUploadQueue step 3</span>
+    <span style="color:#64748b;margin-left:8px">▼</span>
+  </div>
+  <div class="api-body">
+    <p>Step 3: Confirms upload succeeded and provides encryption metadata for backend decryption.</p>
+    <p><b>Request Body:</b></p>
+    <pre>{
+  "job_id": 12345,
+  "timestamp": 1718000000,
+  "s3_key": "recordings/job_12345/clip_1718000000.enc",
+  "is_sos": true,
+  "encryption": {
+    "algorithm": "AES-256-GCM",
+    "iv": "base64_encoded_12_bytes",
+    "auth_tag": "base64_encoded_16_bytes",
+    "wrapped_key": "base64_RSA_OAEP_SHA256_wrapped_AES_key",
+    "key_algorithm": "RSA-OAEP-SHA256"
+  },
+  "duration_seconds": 10,
+  "file_extension": "m4a",
+  "is_compressed": true
+}</pre>
+    <p><b>Response (200 or 409):</b> success. SQLite row deleted. Fires <span class="ev">expert_shield_upload_success</span>.</p>
+    <p><b>On failure:</b> _retryOrDrop → exponential backoff → max 5 retries → <span class="ev">expert_shield_upload_dropped</span>.</p>
+  </div>
+</div>
+
+</div><!-- end section -->
+</div><!-- end tab-api -->
+
+<!-- ═══════════ TAB: BRIDGE ═══════════ -->
+<div id="tab-bridge" class="tab-content">
+
+<div class="section">
+  <h3>Flutter → Native: MethodChannel · com.snabbit.safetyshield/methods</h3>
+  <table class="btable">
+    <thead><tr><th>Method</th><th>Args (Dart → Android)</th><th>Return</th><th>Where called (Dart)</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">initialize</td><td class="mono-a">SafetyShieldConfig.toMap() — all RC-configured fields</td><td>void</td><td>ensureInitialized()</td></tr>
+      <tr><td class="mono">updateAudioConfig</td><td class="mono-a">{durationSec, intervalSec}</td><td>void</td><td>config changes</td></tr>
+      <tr><td class="mono">updateDetectionThresholds</td><td class="mono-a">{dbSpikeThreshold, accelMagnitudeG, yamnetConf, vadConf, yamnetTopK, ...}</td><td>void</td><td>config changes</td></tr>
+      <tr><td class="mono">checkPermission</td><td class="mono-a">{type: "microphone"}</td><td>String status</td><td>ensureInitialized, onAppResumed</td></tr>
+      <tr><td class="mono">requestPermission</td><td class="mono-a">{type: "microphone"}</td><td>String status</td><td>ensureInitialized</td></tr>
+      <tr><td class="mono">checkAllPermissions</td><td class="mono-a">none</td><td>Map&lt;String,String&gt;</td><td>diagnostics</td></tr>
+      <tr><td class="mono">requestAllPermissions</td><td class="mono-a">none</td><td>Map&lt;String,String&gt;</td><td>setup flow</td></tr>
+      <tr><td class="mono">startRecording</td><td class="mono-a">none</td><td>void/error</td><td>_startRecordingAndMonitoring()</td></tr>
+      <tr><td class="mono">stopRecording</td><td class="mono-a">none</td><td>void</td><td>stopShield()</td></tr>
+      <tr><td class="mono">getRecordingState</td><td class="mono-a">none</td><td>"recording"/"idle"/"paused"</td><td>startShield() desync check</td></tr>
+      <tr><td class="mono">startMonitoring</td><td class="mono-a">none</td><td>void/error</td><td>_startRecordingAndMonitoring()</td></tr>
+      <tr><td class="mono">stopMonitoring</td><td class="mono-a">none</td><td>void/error</td><td>stopShield()</td></tr>
+      <tr><td class="mono">confirmSoS</td><td class="mono-a">none</td><td>void</td><td>_completeSosConfirm(), onSOSTriggered()</td></tr>
+      <tr><td class="mono">denySoS</td><td class="mono-a">none</td><td>void</td><td>_completeSosDeny(), onFalseAlarm()</td></tr>
+      <tr><td class="mono">deescalateSoS</td><td class="mono-a">none</td><td>void</td><td>deescalateSos()</td></tr>
+      <tr><td class="mono">triggerManualSoS</td><td class="mono-a">none</td><td>void</td><td>triggerManualSosOnly(), _executeSosConfirm(), onSOSTriggered(slider)</td></tr>
+      <tr><td class="mono">discardAESKey</td><td class="mono-a">none</td><td>void</td><td>_handleEncryptedAudio (after RSA-wrap)</td></tr>
+      <tr><td class="mono">discardCurrentRecording</td><td class="mono-a">none</td><td>void</td><td>error recovery</td></tr>
+      <tr><td class="mono">shutdown</td><td class="mono-a">none</td><td>void</td><td>dispose()</td></tr>
+      <tr><td class="mono">onJobStarted</td><td class="mono-a">none</td><td>void (tolerant)</td><td>onJobStartedAndAutoStart(), startShield() retry</td></tr>
+      <tr><td class="mono">onJobEnded</td><td class="mono-a">none</td><td>void (tolerant)</td><td>onJobEnded()</td></tr>
+      <tr><td class="mono">notifyStreamsReady</td><td class="mono-a">none</td><td>void</td><td>ensureInitialized() after stream subs</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h3>Native → Flutter: EventChannels · com.snabbit.safetyshield/events/*</h3>
+  <table class="btable">
+    <thead><tr><th>Channel Suffix</th><th>Dart Handler</th><th>Payload Shape</th><th>When Emitted</th></tr></thead>
+    <tbody>
+      <tr><td class="mono-g">/encrypted_audio</td><td>_handleEncryptedAudio</td><td class="mono-a">{filePath, aesSecretKey (b64), iv (b64), authTag (b64)}</td><td>m4a clip encrypted → .enc written</td></tr>
+      <tr><td class="mono-g">/sos_triggered</td><td>_handleSoSTriggered</td><td class="mono-a">{source: "ml"|"accelerometer"|"volumeButton"|"notificationButton"|"manual", triggerType: "ml"|"non_ml"}</td><td>StateMachine.triggerSoS() succeeds</td></tr>
+      <tr><td class="mono-g">/recording_state</td><td>_handleRecordingStateChanged</td><td class="mono-a">{state: "recording"|"paused"|"idle"}</td><td>SM transitions, resetToIdle(), onDestroy()</td></tr>
+      <tr><td class="mono-g">/monitoring_state</td><td>_handleMonitoringStateChanged</td><td class="mono-a">{state: "active"|"idle"}</td><td>startMonitoring / stopMonitoring</td></tr>
+      <tr><td class="mono-g">/error</td><td>_handleError</td><td class="mono-a">{code: SafetyShieldErrorCode.name, message: String, details?: String}</td><td>Any exception in service/plugin scope</td></tr>
+      <tr><td class="mono-g">/instrumentation</td><td>_handleInstrumentationEvent</td><td class="mono-a">{eventName: String, properties: Map&lt;String,Any?&gt;, timestamp: Long}</td><td>All telemetry in SafetyMonitoringService</td></tr>
+      <tr><td class="mono-g">/notification_action</td><td>_handleNotificationAction</td><td class="mono-a">{action: "confirm"|"deny"|"sos_button", source: String, timestamp: Long}</td><td>NotificationActionReceiver broadcast</td></tr>
+      <tr><td class="mono-g">/permission_status</td><td>_handlePermissionStatusChanged</td><td class="mono-a">{permission, status}</td><td>Permission state changes</td></tr>
+      <tr><td class="mono-g">/accessibility_service</td><td>_handleAccessibilityServiceStatus</td><td class="mono-a">{status: "connected"|"disconnected"|"killed"}</td><td>VolumeButtonService lifecycle</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><b>Fallback paths (when EventChannel sink is null/stale):</b> Native calls back to Dart via MethodChannel invocation — <span class="mono">onSoSTriggeredFallback</span> {source, triggerType} and <span class="mono">onNotificationActionFallback</span> {action, source, timestamp}. Both merged into the EventChannel streams via StreamControllers in the plugin Dart wrapper.</div>
+</div>
+
+<div class="section">
+  <h3>Pending Listener Queue (SafetyMonitoringService)</h3>
+  <div class="note">When <span class="mono">listener==null</span> (Flutter engine temporarily detached or notifyStreamsReady not yet called), all <span class="mono">notifyListener{}</span> calls are stored in <span class="mono">pendingListenerCalls</span> (synchronizedList). Queue flushed when <span class="mono">notifyStreamsReady()</span> sets the listener. This ensures no instrumentation or SOS events are dropped during hot restart or engine reattach.</div>
+</div>
+
+</div><!-- end tab-bridge -->
+
+<!-- ═══════════ TAB: ANALYTICS ═══════════ -->
+<div id="tab-analytics" class="tab-content">
+<div class="section"><h3>Complete Analytics Event Map — Safety Shield Integration</h3>
+<div class="note" style="margin-bottom:12px">CX = Coralogix (MonitoringServiceHelper) · MP = Mixpanel (MixpanelSetup.logEvent) · CT = CleverTap (ClevertapSetup.logEvent). Shield events always fire to MP+CT together via _trackShieldEvent with super-props {runner_id, cluster_id, region_id, job_id, consent_given, storage_limit, time}.</div>
+<table class="atable">
+  <thead><tr><th>Event</th><th>Properties</th><th>Trigger / File</th><th>Planes</th></tr></thead>
+  <tbody>
+    <tr><td><span class="ev">expert_shield_banner_visible</span></td><td>{}</td><td>SnabbitShieldCard.initState → addPostFrameCallback</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_banner_cta</span></td><td>{action:"activate"}</td><td>Activate button tap · snabbit_shield_card.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_banner_hidden</span></td><td>{}</td><td>card visible→false transition · safety_shield_adapter.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_rc_fallback</span></td><td>{reason:"rc_unavailable"}</td><td>ensureInitialized RC unavailable · safety_shield_adapter.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_started</span></td><td>{trigger}</td><td>RecordingState.recording + !wasPaused · shield_event_handler.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_paused</span></td><td>{reason:"audio_interruption", trigger}</td><td>RecordingState.paused · shield_event_handler.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_resumed</span></td><td>{trigger}</td><td>RecordingState.recording + wasPaused · shield_event_handler.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_stopped</span></td><td>{reason}</td><td>onJobEnded() / shield disabled · shield_start_stop_controller.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_error</span></td><td>{error, trigger, detail?}</td><td>Any gate failure or PlatformException · multiple files</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_permission_changed</span></td><td>{permission, status}</td><td>/permission_status EventChannel · shield_event_handler.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_storage_warning</span></td><td>{}</td><td>isLowStorage state change · safety_shield_adapter.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_storage_full</span></td><td>{trigger}</td><td>Gate 3 storage block · shield_start_stop_controller.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_consent_bs</span></td><td>{eventProps, runner_id, consent_given, source}</td><td>Before consent sheet shown · shield_consent_provider.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_consent_given</span></td><td>{runner_id}</td><td>After POST /consent 200 · shield_consent_provider.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_consent_error</span></td><td>{eventProps, runner_id, error}</td><td>Consent sheet show error · shield_consent_provider.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_initiated</span></td><td>{source, trigger_type, sos_id}</td><td>After POST /sos/initiate 200 · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_initiate_failed</span></td><td>{source, trigger_type, job_id}</td><td>POST /sos/initiate failure · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_concurrent_overridden</span></td><td>{source, trigger_type, active_sos_id}</td><td>SOS triggered while one already in progress · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_sheet_skipped</span></td><td>{source, trigger_type, sos_id, context_null}</td><td>_isShowing guard or null context · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_alert_bs</span></td><td>{sos_id}</td><td>onShown callback of ShieldAlertBottomSheet · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_alert_confirm_click</span></td><td>{sos_id}</td><td>Primary btn tap in alert sheet · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_alert_deny_click</span></td><td>{sos_id}</td><td>Secondary btn tap in alert sheet · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_notification_confirm_tap</span></td><td>{sos_id, source, context_available}</td><td>_handleNotificationConfirm · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_confirmed</span></td><td>{action_type, sos_id}</td><td>_completeSosConfirm (non-sync) · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_denied</span></td><td>{action_type, sos_id}</td><td>_completeSosDeny (non-sync) · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_deny_api_failed</span></td><td>{sos_id, source, action_type, error}</td><td>_executeSosDeny exception · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_deescalated</span></td><td>{}</td><td>deescalateSos() · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_deescalate_error</span></td><td>{sos_id, error}</td><td>deescalateSos() API exception · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_synced</span></td><td>{}</td><td>_handleSyncInitiated · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_sync_confirmed</span></td><td>{sos_id, action_type:"backend"}</td><td>_handleSyncConfirmed · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_sync_denied</span></td><td>{action_type:"backend"}</td><td>_handleSyncDenied · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_state_desync</span></td><td>{local_sos_mode:true, backend_has_active_sos:false, job_id}</td><td>syncActiveSosState desync · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_sos_push_drained</span></td><td>{sos_id, action}</td><td>_drainPendingSosPush · safety_shield_adapter.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_deterrence_played</span></td><td>{}</td><td>_startDeterrence onPlayed callback · sos_flow_coordinator.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_upload_success</span></td><td>{job_id, is_sos, retry_count, clip_size_bytes}</td><td>confirmUpload 200 · snabbit_shield_upload_queue.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">expert_shield_upload_dropped</span></td><td>{job_id, is_sos, retry_count, failed_step, status_code, reason}</td><td>max retries exhausted · snabbit_shield_upload_queue.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">audio_capture_stopped</span></td><td>{reason, duration_ms}</td><td>stopAudioCapture(reason) · SafetyMonitoringService.kt</td><td><div class="planes"><span class="plane-cx">CX</span></div></td></tr>
+    <tr><td><span class="ev">model_load_partial_failure</span></td><td>{failedModel:"yamnet"|"vad"|"unknown", reason}</td><td>ML model load failure · SafetyMonitoringService.kt</td><td><div class="planes"><span class="plane-cx">CX</span></div></td></tr>
+    <tr><td><span class="ev">notification_display_failed</span></td><td>{channel, reason}</td><td>onNotificationFailed callback · SafetyMonitoringService.kt</td><td><div class="planes"><span class="plane-cx">CX</span></div></td></tr>
+    <tr><td><span class="ev">notification_action_null_callback</span></td><td>{action}</td><td>onNullCallbackDetected · SafetyMonitoringService.kt</td><td><div class="planes"><span class="plane-cx">CX</span></div></td></tr>
+    <tr><td><span class="ev">shake_motion_detected</span></td><td>{magnitude, qualifying_count}</td><td>onShakeDataDetected · SafetyMonitoringService.kt</td><td><div class="planes"><span class="plane-cx">CX</span></div></td></tr>
+    <tr><td><span class="ev">detection_evaluated</span></td><td>{matchedStages, failedStage, dbLevel, vadConf, yamnetClass, yamnetConf, yamnetTopK}</td><td>onPartialMatch · SafetyMonitoringService.kt (throttled 1000ms CX, throttled 1000ms MP/CT milestone)</td><td><div class="planes"><span class="plane-cx">CX</span><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">sos_popup_viewed</span></td><td>{}</td><td>SOSPopup.didChangeDependencies init guard · sos.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">sos_trigger_failed</span></td><td>{reason:"not_allowed_by_backend"|"non_200_response"|"exception", error?}</td><td>SOSProvider.triggerSOS failure paths · sos.dart</td><td><div class="planes"><span class="plane-mp">MP</span><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">sos_triggered</span></td><td>{sos:"SOS slider used", source:"slider"}</td><td>SOS slider action (before API call) · sos.dart</td><td><div class="planes"><span class="plane-ct">CT</span></div></td></tr>
+    <tr><td><span class="ev">sos_false_alarm_confirmed</span></td><td>{}</td><td>SOSPopup false alarm confirm · sos.dart</td><td><div class="planes"><span class="plane-ct">CT</span></div></td></tr>
+  </tbody>
+</table>
+</div>
+</div><!-- end tab-analytics -->
+
+</div><!-- end flow-area -->
+
+<!-- Detail Panel -->
+<div class="detail" id="detail-panel">
+  <div class="detail-hdr">
+    <h3 id="detail-title">Detail</h3>
+    <button class="close-btn" onclick="closeDetail()">✕</button>
+  </div>
+  <div class="detail-body" id="detail-body"></div>
+</div>
+
+</div><!-- end main -->
+</div><!-- end app -->
+
+<script>
+function showTab(id){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  event.target.classList.add('active');
+  closeDetail();
+}
+
+function toggleApi(hdr){
+  const body = hdr.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+const DETAILS = {
+  'ml': {title:'ML Detection — DetectionService.kt', body:`
+    <div class="detail-section"><h4>3-Gate AND Logic</h4>
+    <p>All 3 gates must pass simultaneously:</p>
+    <ul>
+      <li><b>Gate 1 — dB Spike:</b> RMS of current PCM chunk in dBFS+96 ≥ (noiseFloor + dbSpikeThreshold). Default threshold: 15.0 dB. Noise floor uses asymmetric EMA (alpha_attack=0.005, alpha_decay=0.05), frozen when VAD/spike active.</li>
+      <li><b>Gate 2 — Silero VAD v5/v6 (ONNX):</b> Input: [1×576 float32] (64 context + 512 new samples). Output: confidence scalar + new state [2,1,128]. State persisted across calls. confidence ≥ vadConfidenceThreshold (default 0.7).</li>
+      <li><b>Gate 3 — YAMNet (TFLite):</b> Input: [15600 float32] ring buffer (975ms @ 16kHz). Output: 521-class scores. Top-K classes checked against yamnetTargetClasses ['Scream','Shout','Gunshot','Glass breaking']. confidence ≥ yamnetConfidenceThreshold (default 0.7).</li>
+    </ul></div>
+    <div class="detail-section"><h4>On Detection</h4>
+    <p>onDistressDetected?.invoke() → SafetyMonitoringService.triggerSoS("ml") → StateMachine.triggerSoS() → notifyListener{ onSoSTriggered("ml", "ml") }</p></div>
+    <div class="detail-section"><h4>Instrumentation emitted</h4>
+    <pre>detection_evaluated: {
+  matchedStages: ["db_spike","vad"],
+  failedStage: "yamnet",
+  dbLevel: 72.3,
+  vadConfidence: 0.91,
+  yamnetClass: "Scream",
+  yamnetConfidence: 0.85,
+  yamnetTopK: [["Scream",0.85],...]
+}</pre></div>`},
+
+  'accel': {title:'AccelerometerService.kt', body:`
+    <div class="detail-section"><h4>Algorithm</h4>
+    <ul>
+      <li>Sensor: TYPE_ACCELEROMETER at SENSOR_DELAY_GAME</li>
+      <li>Normalize to G-force. Check totalG ≥ magnitudeThresholdG (default 1.5G)</li>
+      <li>Check directional reversal: dot product with last direction &lt; 0</li>
+      <li>Prune timestamps outside windowSec (default 5.0s)</li>
+      <li>If ≥ 3 reversals in window → trigger SoS</li>
+      <li>Cooldown: cooldownSec (default 5s) between detections</li>
+    </ul></div>
+    <div class="detail-section"><h4>Callbacks</h4>
+    <pre>onShakeDetected: () -> triggerSoS("accelerometer")
+onShakeDataDetected: (magnitude, count) -> instrumentation</pre></div>
+    <div class="detail-section"><h4>RC Config keys</h4>
+    <pre>shieldAccelerometerMagnitudeG (default 2.7)
+shieldAccelerometerWindowSec (default 5.0)
+shieldAccelerometerCooldownSec (default 5)</pre></div>`},
+
+  'vol': {title:'VolumeButtonService.kt — AccessibilityService', body:`
+    <div class="detail-section"><h4>Operation</h4>
+    <ul>
+      <li>AccessibilityService with FLAG_REQUEST_FILTER_KEY_EVENTS</li>
+      <li>onKeyEvent intercepts KEYCODE_VOLUME_UP or KEYCODE_VOLUME_DOWN, ACTION_DOWN only</li>
+      <li>Gate: isJobActive must be true (set by onJobStarted())</li>
+      <li>Records timestamp on each press; prunes older than clickWindowSec</li>
+      <li>If pressTimestamps.size ≥ clickCount → invoke onSoSTriggered + consume event</li>
+    </ul></div>
+    <div class="detail-section"><h4>RC Config</h4>
+    <pre>shieldVolumeClickCount (default 3 presses)
+shieldVolumeClickWindowSec (default 1.5s)</pre></div>
+    <div class="detail-section"><h4>Status callbacks</h4>
+    <pre>onStatusChanged: "connected" (onServiceConnected)
+               "killed" (onDestroy)
+// → emitted via /accessibility_service EventChannel</pre></div>`},
+
+  'manual': {title:'Manual SOS — Dart trigger path', body:`
+    <div class="detail-section"><h4>Flow</h4>
+    <ul>
+      <li>Runner taps SOS button or uses SOS slider widget (sos.dart)</li>
+      <li>SosFlowCoordinator.triggerManualSosOnly() called</li>
+      <li>Ensures plugin initialized</li>
+      <li>Creates Completer with 10s timeout</li>
+      <li>await _shield.triggerManualSoS() → MethodChannel → SafetyMonitoringService.triggerSoS("manual")</li>
+      <li>Native state machine fires onSoSTriggered("manual") EventChannel</li>
+      <li>_handleSoSTriggered detects source=manual → calls completeManualSosIfPending()</li>
+      <li>Completer resolves → continues to initiateSosAndShowSheet</li>
+    </ul></div>
+    <div class="detail-section"><h4>Slider path (sos.dart SOSProvider.triggerSOS)</h4>
+    <p>Separate flow — calls RunnerHttp.runnerSOS directly (no sos_id). Fires sos_triggered (CT only, before API). Does NOT go through SosFlowCoordinator.</p></div>`},
+
+  'fcm': {title:'FCM Push SOS Path', body:`
+    <div class="detail-section"><h4>Push Received (background/killed)</h4>
+    <ul>
+      <li>FCM data payload: {action: "safety_shield_sos", sos_id: 789}</li>
+      <li>If SafetyShieldAdapter is not mounted: ShieldSosPushStore.persist({action, sosId}) → SharedPreferences key "pending_shield_sos_action"</li>
+      <li>If mounted/foreground: handleSOSNotification(action, sosId) called directly</li>
+    </ul></div>
+    <div class="detail-section"><h4>Push Drained (foreground restore)</h4>
+    <ul>
+      <li>onAppResumed() → _drainPendingSosPush()</li>
+      <li>ShieldSosPushStore.drain() → reads + removes from SharedPreferences</li>
+      <li>Fires expert_shield_sos_push_drained {sos_id, action}</li>
+      <li>Calls handleSOSNotification(action, sosId) → SosFlowCoordinator.handleSosNotification()</li>
+    </ul></div>
+    <div class="detail-section"><h4>Belt-and-suspenders</h4>
+    <p>syncActiveSosState() also runs on resume — catches any push that was missed before ShieldSosPushStore was initialized.</p></div>`},
+
+  'power': {title:'Power Button SOS (iOS only)', body:`
+    <div class="detail-section"><h4>Status: C-06 Pending Fix</h4>
+    <p>Current implementation approximates power button via willResignActive / didBecomeActive lifecycle. Not a true hardware button intercept — iOS does not provide API for power button events.</p></div>
+    <div class="detail-section"><h4>False positive risk</h4>
+    <p>willResignActive fires for many non-power-button events (incoming calls, notifications, multitask gesture). Requires additional filtering logic. C-06 in pending track.</p></div>`},
+
+  'statemachine': {title:'StateMachine.kt — SOS States', body:`
+    <div class="detail-section"><h4>States</h4>
+    <pre>IDLE
+RECORDING_ONLY
+MONITORING
+SOS_PENDING
+SOS_CONFIRMED</pre></div>
+    <div class="detail-section"><h4>Allowed transitions</h4>
+    <pre>IDLE → RECORDING_ONLY: startRecording()
+IDLE/RECORDING_ONLY → MONITORING: startMonitoring()
+any → SOS_PENDING: triggerSoS() [returns false if already pending/confirmed]
+SOS_PENDING → SOS_CONFIRMED: confirmSoS()
+SOS_PENDING → previousState: denySoS()
+SOS_CONFIRMED → MONITORING: deescalateSoS(toMonitoring=true)
+SOS_CONFIRMED → RECORDING_ONLY: deescalateSoS(toMonitoring=false)
+any → IDLE: shutdown() [fires onStateChanged]
+any → IDLE: reset() [silent, no callback]</pre></div>`},
+
+  'notifylistener': {title:'notifyListener{} — Pending Queue Pattern', body:`
+    <div class="detail-section"><h4>Purpose</h4>
+    <p>All callbacks from SafetyMonitoringService to Flutter go through notifyListener{}. This is NOT a direct call.</p></div>
+    <div class="detail-section"><h4>Logic</h4>
+    <pre>fun notifyListener(block: MonitoringListener.() -> Unit) {
+  val l = listener
+  if (l != null) {
+    l.block()
+  } else {
+    // Flutter engine temporarily detached
+    pendingListenerCalls.add(block)
+  }
+}</pre></div>
+    <div class="detail-section"><h4>Queue flush</h4>
+    <p>When notifyStreamsReady() is called by Dart after stream subscriptions, listener is set and all pendingListenerCalls are flushed in order.</p></div>`},
+
+  'handlesos': {title:'ShieldEventHandler._handleSoSTriggered()', body:`
+    <div class="detail-section"><h4>Receives</h4>
+    <pre>SoSTriggeredEvent {
+  source: SoSSource (ml, accelerometer, volumeButton, notificationButton, manual),
+  triggerType: SoSTriggerType (ml, nonMl)
+}</pre></div>
+    <div class="detail-section"><h4>Actions</h4>
+    <ul>
+      <li>Maps source to API string via _mapSoSSourceToApi()</li>
+      <li>Calls sosCoordinator.initiateSosAndShowSheet(apiSource, triggerType)</li>
+      <li>If source == manual: calls completeManualSosIfPending() to resolve the Completer</li>
+    </ul></div>`},
+
+  'api-initiate': {title:'POST /sos/initiate', body:`
+    <div class="detail-section"><h4>Request</h4>
+    <pre>POST api/v1/runners/me/sos/initiate
+{
+  "source": "safety_shield",
+  "trigger_type": "ml",
+  "job_id": 12345
+}</pre></div>
+    <div class="detail-section"><h4>Response (200)</h4>
+    <pre>{ "sos_id": 789 }</pre></div>
+    <div class="detail-section"><h4>On failure</h4>
+    <p>Fires expert_shield_sos_initiate_failed. Returns without showing sheet. SOS flow aborted for this trigger.</p></div>`},
+
+  'api-confirm': {title:'POST /sos — confirm', body:`
+    <div class="detail-section"><h4>Request</h4>
+    <pre>POST api/v1/runners/me/sos
+{ "sos_id": 789, "user_action": "confirm" }</pre></div>
+    <div class="detail-section"><h4>Response (200)</h4>
+    <pre>{ "ph_no": "+91XXXXXXXXXX" }</pre></div>
+    <div class="detail-section"><h4>Where called</h4>
+    <p>_executeSosConfirm(callApi: true) — from both foreground sheet confirm AND lock-screen notification confirm (context may be null for latter).</p></div>`},
+
+  'api-deny': {title:'POST /sos — deny', body:`
+    <div class="detail-section"><h4>Request</h4>
+    <pre>POST api/v1/runners/me/sos
+{ "sos_id": 789, "user_action": "deny" }</pre></div>
+    <div class="detail-section"><h4>Response</h4><p>Not consumed.</p></div>
+    <div class="detail-section"><h4>On exception</h4><p>Fires expert_shield_sos_deny_api_failed {sos_id, source, action_type, error} — both planes.</p></div>`},
+
+  'api-deesc': {title:'POST /sos — dismiss (deescalate)', body:`
+    <div class="detail-section"><h4>Request</h4>
+    <pre>POST api/v1/runners/me/sos
+{ "sos_id": 789, "user_action": "dismiss" }</pre></div>
+    <div class="detail-section"><h4>On exception</h4><p>Fires expert_shield_sos_deescalate_error {sos_id, error} — both planes.</p></div>`},
+
+  'api-active': {title:'GET /sos/active — Sync Check', body:`
+    <div class="detail-section"><h4>Request</h4>
+    <pre>GET api/v1/runners/me/sos/active
+// No body, auth header only</pre></div>
+    <div class="detail-section"><h4>Response</h4>
+    <pre>{
+  "has_active_sos": true,
+  "sos": {
+    "status": "initiated" | "pending" | "resolved",
+    "sos_id": 789,
+    "ph_no": "+91XXXXXXXXXX"
+  }
+}</pre></div>
+    <div class="detail-section"><h4>Routing</h4>
+    <ul>
+      <li>"initiated" → _handleSyncInitiated (show sheet if !isSOSMode)</li>
+      <li>"pending" → _handleSyncConfirmed (complete confirm, navigate SOSActiveScreen)</li>
+      <li>has_active_sos=false + local isSOSMode=true → _handleSyncDenied (desync)</li>
+      <li>has_active_sos=false + local isSOSMode=false → no-op</li>
+    </ul></div>`},
+
+  'notif-receiver': {title:'NotificationActionReceiver.kt', body:`
+    <div class="detail-section"><h4>BroadcastReceiver — 3 actions</h4>
+    <pre>ACTION_SOS_BUTTON → onSoSButtonClicked?.invoke()
+  // if null → onNullCallbackDetected.invoke("sosButton")
+
+ACTION_CONFIRM_SOS → onConfirmSoSClicked?.invoke()
+  // → stateMachine.confirmSoS()
+  // → burst recording config applied
+  // → dismiss alert notif (1002)
+  // if null → onNullCallbackDetected.invoke("confirmSos")
+
+ACTION_DENY_SOS → onDenySoSClicked?.invoke()
+  // → stateMachine.denySoS()
+  // → restore monitoring config
+  // if null → onNullCallbackDetected.invoke("denySos")</pre></div>
+    <div class="detail-section"><h4>Null callback path</h4>
+    <p>When service is killed mid-SOS, callbacks are null. onNullCallbackDetected fires notification_action_null_callback instrumentation event (CX only). Event is buffered in pendingListenerCalls for delivery when Flutter engine reattaches.</p></div>`},
+
+  'notif-confirm': {title:'_handleNotificationConfirm() — Lock-screen confirm', body:`
+    <div class="detail-section"><h4>Context: null is intentional</h4>
+    <p>When SOS is confirmed from lock screen, there is no mounted BuildContext. The null-context guard bug (IG-18) was that the backend API was only called when context != null. Fixed: API is always called regardless of context.</p></div>
+    <div class="detail-section"><h4>Actions</h4>
+    <ul>
+      <li>Sets _sosResolvedExternally = true (prevents auto-deny on sheet whenComplete)</li>
+      <li>Calls ShieldAlertBottomSheet.hide(context) if context available</li>
+      <li>Fires expert_shield_sos_notification_confirm_tap {sos_id, source, context_available}</li>
+      <li>Calls _executeSosConfirm(context: null or context, callApi: true)</li>
+    </ul></div>`},
+
+  'complete-confirm': {title:'_completeSosConfirm() — Final confirm', body:`
+    <div class="detail-section"><h4>Actions in order</h4>
+    <ul>
+      <li>Sets _confirmedSosId</li>
+      <li>provider.setSOSMode(true)</li>
+      <li>await _shield.confirmSoS() — MethodChannel</li>
+      <li>_startDeterrence() — plays deterrence audio after RC delay (shieldSosDeterrenceDelaySecs default 3s)</li>
+      <li>Fires expert_shield_sos_confirmed {action_type, sos_id} (unless fromSync)</li>
+      <li>SOSProvider.setStep(SOSStep.postSOS)</li>
+      <li>SOSProvider.setPhoneNumber(ph_no)</li>
+      <li>If context != null: Navigator.push → SOSActiveScreen</li>
+    </ul></div>`},
+
+  'alertsheet': {title:'ShieldAlertBottomSheet — SOS Alert UI', body:`
+    <div class="detail-section"><h4>Static state</h4>
+    <pre>_isShowing: bool — prevents double-show
+// Fixed: whenComplete(() => _isShowing = false)
+// so swipe-dismiss resets the flag correctly</pre></div>
+    <div class="detail-section"><h4>Auto-deny timer</h4>
+    <p>Started in _showSosAlertSheet. Duration = RC shieldSosAlertDisplaySecs (default 20s). On expiry: if !_sosResolvedExternally → calls _executeSosDeny.</p></div>
+    <div class="detail-section"><h4>onShown callback</h4>
+    <p>Fires expert_shield_sos_alert_bs via addPostFrameCallback in _ShieldAlertSheetOnShownScope.</p></div>`},
+
+  'sync': {title:'syncActiveSosState() — SOS recovery on resume', body:`
+    <div class="detail-section"><h4>Called from</h4>
+    <ul>
+      <li>onJobStartedAndAutoStart() — cold-start recovery</li>
+      <li>onAppResumed() — app comes to foreground</li>
+    </ul></div>
+    <div class="detail-section"><h4>Guard in _handleSyncInitiated</h4>
+    <pre>if (_shieldProvider.isSOSMode) return;
+// Prevents re-showing alert sheet after SOS already confirmed
+// This fixed the IG-17 "re-shows confirmation sheet" bug</pre></div>`},
+
+  'sync-initiated': {title:'_handleSyncInitiated() — Backend says "initiated"', body:`
+    <div class="detail-section"><h4>Actions</h4>
+    <ul>
+      <li>Guard: if (isSOSMode) return — SOS already confirmed locally</li>
+      <li>Starts shield if not active</li>
+      <li>Triggers manual SoS via _shield.triggerManualSoS()</li>
+      <li>Sets _pendingSosId from sync</li>
+      <li>Shows ShieldAlertBottomSheet</li>
+      <li>Fires expert_shield_sos_synced</li>
+    </ul></div>`},
+
+  'sync-confirmed': {title:'_handleSyncConfirmed() — Backend says "pending"', body:`
+    <div class="detail-section"><h4>Actions</h4>
+    <ul>
+      <li>Hides alert sheet (ShieldAlertBottomSheet.hide)</li>
+      <li>Triggers manual SoS</li>
+      <li>Fires expert_shield_sos_sync_confirmed {sos_id, action_type:"backend"}</li>
+      <li>Calls _completeSosConfirm(fromSync: true) — navigates SOSActiveScreen without calling confirm API again</li>
+    </ul></div>`},
+
+  'sos-active': {title:'SOSActiveScreen — Active SOS UI', body:`
+    <div class="detail-section"><h4>Screen contents</h4>
+    <ul>
+      <li>Shows phone number (from confirm API response or RC fallback)</li>
+      <li>"Call Support" button → CallUtils.handleCallInitiation(phoneNumber)</li>
+      <li>"End SOS" button → deescalateSos() → POST /sos dismiss</li>
+      <li>Deterrence audio playing in background</li>
+    </ul></div>
+    <div class="detail-section"><h4>Analytics</h4>
+    <pre>expert_shield_sos_active_load: {}
+expert_shield_sos_active_call_team_cta: {}
+expert_shield_sos_active_end_sos_cta: {}</pre></div>`},
+
+  'g0': {title:'Gate 0 — Job ID Check', body:`<div class="detail-section"><h4>Check</h4><p>_currentJobId() != null</p></div><div class="detail-section"><h4>On fail</h4><p>Silent return. Normal pre-job state. No analytics event.</p></div>`},
+  'g0b': {title:'Gate 0b — State Desync Check', body:`<div class="detail-section"><h4>Check</h4><p>await _shield.getRecordingState() — compares native state with provider state.</p></div><div class="detail-section"><h4>Desync resolution</h4><pre>provider.isActive + native=idle → provider.reset()
+!provider.isActive + native≠idle → sync provider forward (don't return)</pre></div>`},
+  'g0c': {title:'Gate 0c — Plugin Init', body:`<div class="detail-section"><h4>Check</h4><p>await ensureInitialized(allowMicPrompt: true)</p></div><div class="detail-section"><h4>ensureInitialized does</h4><ul><li>Check/request mic permission</li><li>Load RSA public key from assets/keys/shield_public_key.pem</li><li>Resolve mlDetectionEnabled from RC (disabled on emulators)</li><li>Build SafetyShieldConfig with all RC values</li><li>Call _shield.initialize(config)</li><li>Subscribe 9 EventChannel streams</li><li>Call _shield.notifyStreamsReady()</li></ul></div><div class="detail-section"><h4>On fail</h4><p>Fires expert_shield_error {error:"init_failed", trigger}</p></div>`},
+  'g1': {title:'Gate 1 — Consent', body:`<div class="detail-section"><h4>Check</h4><p>ShieldConsentProvider.ensureConsent(context, user, eventProps)</p></div><div class="detail-section"><h4>Flow</h4><ul><li>user.consentGiven != true → shows consent bottom sheet</li><li>Runner taps consent → POST /safety-shield/consent {consent:true, consent_version:"1.0"}</li><li>200 → userProfile.consentGiven = true, fires expert_shield_consent_given</li></ul></div>`},
+  'g2': {title:'Gate 2 — Battery', body:`<div class="detail-section"><h4>RC thresholds</h4><pre>shieldBatteryBlockThreshold: 15% (hard block)
+shieldBatteryWarnThreshold: 20% (soft warn, sheet with cooldown)</pre></div><div class="detail-section"><h4>SharedPrefs</h4><pre>key: shield_battery_sheet_last_shown (epoch ms)
+cooldown: shieldBatterySheetCooldownSecs (default 7200s)</pre></div>`},
+  'g3': {title:'Gate 3 — Storage', body:`<div class="detail-section"><h4>Check</h4><p>await _shieldProvider.updateStorageStatus() → checkShieldStorageLow() → DiskSpace check</p></div><div class="detail-section"><h4>On fail (dual-fire)</h4><p>expert_shield_error {error:"storage_insufficient"} AND expert_shield_storage_full — intentional dual-fire. Analytics schema should not double-count.</p></div>`},
+  'g5': {title:'Gate 5 — Encryptor', body:`<div class="detail-section"><h4>Check</h4><p>_encryptor() != null</p></div><div class="detail-section"><h4>Encryptor setup</h4><p>ShieldEncryptor.fromPem(pem) in ensureInitialized. Loads RSA public key from assets/keys/shield_public_key.pem. SPKI DER decode → RSAPublicKey via pointycastle.</p></div>`},
+  'g6': {title:'Gate 6 — Upload Queue', body:`<div class="detail-section"><h4>Check</h4><p>_uploadQueue() != null — with lazy init fallback</p></div><div class="detail-section"><h4>Lazy init</h4><pre>ShieldDatabase.instance.initialize()
+ShieldUploadQueue(db: ShieldDatabase.instance)
+uploadQueue.start() // connects Connectivity stream
+GlobalState().shieldUploadQueue = uploadQueue</pre></div>`},
+
+  'audio-cap': {title:'AudioService.kt — Audio Capture', body:`<div class="detail-section"><h4>Stack</h4><ul><li>AudioRecord: MIC source, 16kHz mono, PCM_16BIT, buffer = getMinBufferSize×2</li><li>MediaCodec: AAC-LC encoder, 128kbps, 1 channel</li><li>MediaMuxer: MPEG-4 container → .m4a files in filesDir/safety_shield_recordings/</li></ul></div><div class="detail-section"><h4>PCM loop</h4><p>Reads ShortArray(bufferSize/2) chunks on Dispatchers.IO. 4× gain applied before encoder. Feeds onPcmData always (for ML). Feeds encoder only when isRecording==true.</p></div><div class="detail-section"><h4>Recording scheduler</h4><p>Coroutine loop: startRecording() → delay(durationSec+intervalSec)ms → repeat. Cancelled/restarted on config changes.</p></div>`},
+
+  'detection': {title:'DetectionService.kt — ML Inference', body:`<div class="detail-section"><h4>YAMNet input</h4><p>15,600 float32 samples (975ms ring buffer). Read in chronological order from ring buffer.</p></div><div class="detail-section"><h4>Silero VAD input</h4><p>[1×576 float32]: 64 context samples + 512 new samples. Stateful [2,1,128] hidden state persisted across frames.</p></div><div class="detail-section"><h4>Labels</h4><p>yamnet_labels.txt: one display name per line, index-aligned with 521 output scores. Degrades to "Class_N" if absent.</p></div>`},
+
+  'encrypt': {title:'EncryptionService.kt — AES-256-GCM', body:`<div class="detail-section"><h4>Pipeline per clip</h4><pre>1. Read .m4a bytes
+2. Gzip compress (GZIPOutputStream)
+3. Generate 256-bit AES key (KeyGenerator + SecureRandom)
+4. Generate 12-byte IV (SecureRandom)
+5. AES/GCM/NoPadding encrypt (128-bit GCM tag)
+6. Split: ciphertext [0..n-16], authTag [n-16..n]
+7. Write .enc file (IV + tag sent separately in metadata)
+8. Delete original .m4a
+9. Return EncryptionResult(filePath, aesKey_b64, iv_b64, authTag_b64)</pre></div><div class="detail-section"><h4>Key wrapping (Dart side)</h4><p>ShieldEncryptor.wrapAesKey(aesKey_b64) → RSA-OAEP-SHA256 encrypt → base64. Done in Dart after receiving encrypted_audio event. Then _shield.discardAESKey() called.</p></div>`},
+
+  'upload-flow': {title:'ShieldUploadQueue — 3-step upload', body:`<div class="detail-section"><h4>SQLite table: snabbit_shield_uploads</h4><pre>id, booking_id, timestamp, encrypted_audio_bytes (BLOB),
+encryption_metadata_json, duration_seconds, is_sos,
+created_at, retry_count, next_attempt_at</pre></div><div class="detail-section"><h4>3-step per row</h4><pre>1. GET /audio/presigned-url?job_id=&timestamp=&is_sos=
+   → 409: DELETE row (duplicate)
+   → other fail: _retryOrDrop
+
+2. PUT {presigned_url} — raw bytes, no auth headers
+   → fail: _retryOrDrop
+
+3. POST /audio/upload-complete — full encryption metadata
+   → 200/409: DELETE row, fire expert_shield_upload_success
+   → fail: _retryOrDrop</pre></div><div class="detail-section"><h4>Retry backoff</h4><p>Exponential: 5000 × 2^(attempt-1) ms, capped at 30min. Max 5 retries → expertShieldUploadDropped.</p></div><div class="detail-section"><h4>Queue cap</h4><p>20 max entries. 7-day age limit. SoS clips preserved over normal clips on eviction (sorted is_sos ASC).</p></div>`},
+
+  'stop-job': {title:'onJobEnded() — Job end cleanup', body:`<div class="detail-section"><h4>Actions in order</h4><ul><li>cancelDeterrence()</li><li>clearPendingManualStart()</li><li>if isActive: fire expert_shield_stopped {reason:"job_ended"}</li><li>activeTrigger = null</li><li>_persistManualMonitoringFlag(false) → SharedPrefs remove</li><li>await stopShield() → stopMonitoring + stopRecording independently</li><li>await _shield.onJobEnded()</li></ul></div>`},
+
+  'auto-start': {title:'onJobStartedAndAutoStart() — Auto start', body:`<div class="detail-section"><h4>Sequence</h4><pre>1. try: await _shield.onJobStarted() — enables volume button SoS
+   catch: fire expertShieldError {error:"job_started_failed"}
+
+2. await _shieldProvider.updateStorageStatus()
+
+3. await startShield(context, trigger: ShieldTrigger.auto)
+
+4. await syncActiveSosState(context) — cold-start SOS recovery</pre></div>`},
+
+  'notif-sos': {title:'NotificationService — SOS Notifications', body:`<div class="detail-section"><h4>3 Notifications</h4><pre>ID 1001 (FOREGROUND): Always visible, state-dependent text.
+  Channel: safety_shield_foreground (IMPORTANCE_HIGH)
+  SOS_CONFIRMED state: custom RemoteViews with siren icon
+
+ID 1002 (SOS_ALERT): Shown on SOS trigger.
+  Channel: safety_shield_sos_alert (IMPORTANCE_HIGH)
+  Vibration: [0,500,200,500,200,500]
+  Buttons: "I'M SAFE" (ACTION_DENY_SOS) + "NEED HELP" (ACTION_CONFIRM_SOS)
+  FLAG_NO_CLEAR + setOngoing(true)
+
+ID 1003 (SOS_TRIGGER): Optional trigger indicator.
+  Channel: safety_shield_foreground
+  Button: SoS button (ACTION_SOS_BUTTON)</pre></div><div class="detail-section"><h4>Anti-grouping (MIUI)</h4><p>Each notification has a unique group key to prevent MIUI from collapsing them.</p></div>`},
+
+  'mc-confirm': {title:'MethodChannel: _shield.confirmSoS()', body:`<div class="detail-section"><h4>Native side (onConfirmSoS handler)</h4><ul><li>stateMachine.confirmSoS() → SOS_PENDING → SOS_CONFIRMED</li><li>Dismiss alert notification (ID 1002) and trigger notification (ID 1003)</li><li>Apply burst recording config: durationSec=sosRecordingDurationSec (10), intervalSec=sosRecordingIntervalSec (1)</li><li>Restart recording scheduler with burst config</li><li>Update foreground notification (1001) to SOS_CONFIRMED state</li></ul></div>`},
+};
+
+function showDetail(key) {
+  const d = DETAILS[key];
+  if (!d) return;
+  document.getElementById('detail-title').textContent = d.title;
+  document.getElementById('detail-body').innerHTML = d.body;
+  document.getElementById('detail-panel').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('open');
+}
+
+// Open all API cards collapsed by default, expand first one
+document.querySelectorAll('.api-body').forEach((b,i)=>{ if(i===0) b.classList.add('open'); });
+</script>
+</body>
+</html>

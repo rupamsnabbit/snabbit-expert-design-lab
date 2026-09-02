@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "519134216248",
+    "project_id": "maestro-prod-c6f7e",
+    "storage_bucket": "maestro-prod-c6f7e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:519134216248:android:bbbe1d2f25c6f50eca66cd",
+        "android_client_info": {
+          "package_name": "com.snabbit.customer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZva8mJvtnyv4itT_V6QOZGOUJEoM2Rrs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:519134216248:android:8ce4b40173e67e86ca66cd",
+        "android_client_info": {
+          "package_name": "com.snabbit.runner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZva8mJvtnyv4itT_V6QOZGOUJEoM2Rrs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

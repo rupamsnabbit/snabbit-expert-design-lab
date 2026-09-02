@@ -1,0 +1,207 @@
+<resources>
+    <!--
+      Camera-module fallback copy (English). These are the DEFAULTS used when the
+      host does not thread server-driven i18n labels. The runtime override still
+      works: CameraStrings / PreviewStrings are data classes the host fills from
+      the app's i18n map. Adding per-locale values/ folders (values-hi, …) later
+      localises these without touching the call sites.
+    -->
+
+    <!-- CameraStrings (capture screen) -->
+    <string name="camera_title">Take a selfie</string>
+    <string name="camera_subtitle">Please ensure you are wearing the uniform.</string>
+    <string name="camera_capture_button">Capture</string>
+    <string name="camera_retake_button">Retake</string>
+    <string name="camera_permission_title">Camera permission required</string>
+    <string name="camera_permission_rationale">We need camera access to take your photo.</string>
+    <string name="camera_permission_allow_action">Allow camera access</string>
+    <string name="camera_permission_denied_message">Camera access is blocked. Enable it in Settings to continue.</string>
+    <string name="camera_permission_settings_action">Open Settings</string>
+    <string name="camera_audio_off_recording">Recording without audio</string>
+    <string name="camera_audio_off_enable">Audio off · tap to enable microphone</string>
+    <string name="camera_audio_off_settings">Audio off · tap to open Settings</string>
+
+    <!-- PreviewStrings (built-in media preview screen) -->
+    <string name="preview_title">Take a selfie</string>
+    <string name="preview_subtitle">Please ensure you are wearing the uniform.</string>
+    <string name="preview_retake_button">Retake</string>
+    <string name="preview_submit_button">Submit</string>
+
+    <!--
+      Job-module fallback copy (English), moved out of JobStrings/CustomerRatingStrings/ContactStrings
+      per PR #452 review. Resolved by the remember*Strings() factories; the host still overrides any
+      value at runtime by threading the app's server-driven i18n label into the corresponding field.
+    -->
+
+    <!-- JobStrings (job lifecycle screen) -->
+    <string name="job_new_job_title">New Job</string>
+    <string name="job_you_will_earn">You Will Earn</string>
+    <string name="job_accept_in">ACCEPT IN</string>
+    <string name="job_accept_job">Accept Job</string>
+    <string name="job_deny">Deny</string>
+    <string name="job_check_in_by">Check In by</string>
+    <string name="job_check_in">Check In</string>
+    <string name="job_check_in_by_caps">CHECK IN BY {time}</string>
+    <string name="job_running_late">RUNNING LATE</string>
+    <string name="job_map_action">Map</string>
+    <string name="job_call_action">Call</string>
+    <string name="job_chat_action">Chat</string>
+    <string name="job_listen">Listen</string>
+    <string name="job_customer_fallback">Snabbit Customer</string>
+    <string name="job_enter_otp_title">Enter OTP to start job</string>
+    <string name="job_otp_helper">Please ask the customer to share the OTP with you</string>
+    <string name="job_start_job">Start Job</string>
+    <string name="job_no_otp">No OTP</string>
+    <string name="job_otp_incorrect">Incorrect OTP entered. Please enter again</string>
+    <string name="job_enter_phone_title">Enter customer phone number</string>
+    <string name="job_phone_helper">Please ask the customer to share the phone number used for this booking</string>
+    <string name="job_use_otp_instead">Use OTP instead</string>
+    <string name="job_phone_mismatch">Phone number doesn't match this booking. Please check and try again.</string>
+    <string name="job_check_in_location_error_title">You're not at the job location</string>
+    <string name="job_check_in_location_error_subtitle">Move closer to the customer's location to start the job.</string>
+    <string name="job_try_again">Try again</string>
+    <string name="job_generic_error">Something went wrong. Please try again.</string>
+    <string name="job_network_error">Your internet connection seems poor. Please check and try again.</string>
+    <string name="job_reassigned">This job has been reassigned to another expert.</string>
+    <string name="job_accepted">Job accepted</string>
+    <string name="job_denied">Job denied</string>
+    <string name="job_red_card_nudge">If job not accepted</string>
+    <string name="job_deny_miss_earnings_title">You will miss earnings of {amount}</string>
+    <string name="job_deny_lose_earnings_title">You will lose your job earnings</string>
+    <string name="job_logout">Logout</string>
+    <string name="job_mark_attendance_title">Mark tomorrow's attendance</string>
+    <string name="job_attendance_present">Present</string>
+    <string name="job_attendance_absent">Absent</string>
+    <string name="job_logged_out_title">Thank You!</string>
+    <string name="job_logged_out_subtitle">You have been logged out successfully!</string>
+    <string name="job_started">Job Started</string>
+    <string name="job_ok_action">OK</string>
+    <string name="job_enter_otp_to_end_job_title">Enter OTP to end job</string>
+    <string name="job_end_job">End Job</string>
+    <string name="job_end_campaign_title">Ask if you can help quickly with anything.</string>
+    <string name="job_okay_action">Okay</string>
+    <string name="job_in_progress_title">Job In Progress</string>
+    <string name="job_complete_job">Complete Job</string>
+    <string name="job_time_left">TIME LEFT</string>
+    <string name="job_auto_checkout_label">AUTO CHECKOUT IN</string>
+    <string name="job_timing_label">Job Timing</string>
+    <string name="job_duration_label">Duration</string>
+    <string name="job_customer_preferences_title">Customer preferences</string>
+    <string name="job_time_up_callout">Time is up!</string>
+    <string name="job_auto_checkout_callout">You will be auto checked out</string>
+    <string name="job_next_job_ready_callout">Next job is ready. Check out to accept.</string>
+    <string name="job_extended_callout">Job extended by {duration}</string>
+    <string name="job_tasks_done_title">What tasks did you do?</string>
+    <string name="job_confirm_action">Confirm</string>
+    <string name="job_select_task_hint">Please select at least one task</string>
+    <string name="job_completed_title">Job Completed</string>
+    <string name="job_you_earned">You Earned</string>
+    <string name="job_ready_for_next_job">Ready for next job</string>
+    <string name="job_customer_blocked_toast">The customer is blocked</string>
+
+    <!-- CustomerRatingStrings (completed-stage rating card) -->
+    <string name="rating_title">Rate the customer</string>
+    <string name="rating_error">Couldn't submit your rating. Please try again.</string>
+
+    <!-- ContactStrings (customer contact feedback) -->
+    <string name="contact_call_initiated">Call has been initiated successfully</string>
+    <string name="contact_call_number_unavailable">Support number unavailable. Please try again later.</string>
+
+    <!-- EmergencyLogoutStrings (emergency-logout flow) -->
+    <string name="emergency_logout_title">Emergency logout will lead to</string>
+    <string name="emergency_logout_go_back">Go back</string>
+    <string name="emergency_logout_logout">Logout</string>
+    <string name="emergency_logout_period_leave_available_template">Period leave ({count} Available)</string>
+    <string name="emergency_logout_red_card_label_template">{count} Red Card</string>
+    <string name="emergency_logout_miss_shift_label">Miss Full Shift</string>
+    <string name="emergency_logout_take_care_title">Take care!</string>
+    <string name="emergency_logout_take_care_body">No red card applied</string>
+    <string name="emergency_logout_take_care_cta">Okay</string>
+    <string name="emergency_logout_load_error">Couldn't load emergency logout details</string>
+    <string name="emergency_logout_confirm_error">Something went wrong</string>
+    <string name="emergency_logout_retry">Retry</string>
+    <string name="emergency_logout_sheet_close">Close</string>
+
+    <!-- ShiftLoginStrings (shift-login selfie flow) -->
+    <string name="shift_login_screen_title">Take a selfie</string>
+    <string name="shift_login_screen_subtitle">Please ensure you are wearing the uniform.</string>
+    <string name="shift_login_intro_title">Take a selfie</string>
+    <string name="shift_login_intro_good_caption">Take clean, Clear selfie</string>
+    <string name="shift_login_intro_bad_header">Do not click selfies like this</string>
+    <string name="shift_login_intro_cta">OK</string>
+    <string name="shift_login_camera_alignment_hint">Align the face and logo</string>
+    <string name="shift_login_success_label">Login successful</string>
+    <string name="shift_login_error_generic_title">Something went wrong</string>
+    <string name="shift_login_error_no_connection">Check your connection and try again.</string>
+    <string name="shift_login_error_unauthorized">Session expired. Please log in again.</string>
+    <string name="shift_login_error_server">Server is unreachable. Please try again.</string>
+    <string name="shift_login_error_unknown">Couldn't log in. Please try again.</string>
+    <string name="shift_login_error_dismiss">OK</string>
+    <string name="shift_login_validation_title">Retake your selfie</string>
+    <string name="shift_login_validation_retake_cta">Retake Photo</string>
+    <string name="shift_login_sheet_close">Close</string>
+    <string name="shift_login_validation_uniform_not_detected">Uniform is not visible</string>
+    <string name="shift_login_validation_face_mismatch">Face did not match. Please try again.</string>
+    <string name="shift_login_validation_face_not_detected">No face found.Please adjust and retry.</string>
+    <string name="shift_login_validation_bike_not_detected">Your Bike is not visible</string>
+    <string name="shift_login_validation_helmet_not_detected">Your Helmet is not visible</string>
+    <string name="shift_login_validation_unknown">Please retake the selfie</string>
+
+    <!-- HomeStrings (Home screen) -->
+    <string name="home_top_nav_sos_label">SOS</string>
+    <string name="home_top_nav_saathi_label">Saathi</string>
+    <string name="home_top_nav_bell_label">Notifications</string>
+    <string name="home_more_from_snabbit_header">More From Snabbit</string>
+    <string name="home_tomorrow_earn_prefix">You can earn</string>
+    <string name="home_tomorrow_mark_attendance_prompt">Mark attendance for tomorrow</string>
+    <string name="home_tomorrow_absent_cta">Absent</string>
+    <string name="home_tomorrow_present_cta">Present</string>
+    <string name="home_today_status_present">Present</string>
+    <string name="home_today_status_absent">Absent</string>
+    <string name="home_today_status_no_show">No Show</string>
+    <string name="home_today_status_false_attendance">False Attendance</string>
+    <string name="home_today_status_absent_terminal">Absent Today</string>
+    <string name="home_today_status_no_show_terminal">No Show Today</string>
+    <string name="home_today_change_cta">Change</string>
+    <string name="home_today_login_cta">Login</string>
+    <string name="home_hotspot_title_not_reached">Your Hotspot</string>
+    <string name="home_hotspot_title_reached">You have Reached</string>
+    <string name="home_hotspot_map_label">Map</string>
+    <string name="home_hotspot_distance_template">{distance} away</string>
+    <string name="home_hotspot_reached_distance">0 km away</string>
+    <string name="home_sheet_absent_cta">Absent</string>
+    <string name="home_sheet_present_cta">Present</string>
+    <string name="home_sheet_close">Close</string>
+    <string name="home_earning_loss_title_prefix">You can</string>
+    <string name="home_earning_loss_title_verb">earn</string>
+    <string name="home_earning_loss_title_suffix">tomorrow</string>
+    <string name="home_earning_loss_subtitle">Change your attendance?</string>
+    <string name="home_earning_loss_no_amount_title">You will lose your earnings for tomorrow</string>
+    <string name="home_mark_tomorrow_title">Mark tomorrow's attendance</string>
+    <string name="home_change_attendance_confirm_title">Are you sure you want to\nchange attendance?</string>
+    <string name="home_waiver_warning_pill">Warning</string>
+    <string name="home_waiver_title">Red cards waived off this time</string>
+    <string name="home_waiver_subtitle_template">Repeated violations lead to {count} red cards</string>
+    <string name="home_waiver_cta">I will not repeat again</string>
+    <string name="home_error_no_connection">Check your connection and try again</string>
+    <string name="home_error_unauthorized">Session expired. Please reopen the app</string>
+    <string name="home_error_server">Something went wrong. Please try again</string>
+    <string name="home_error_unknown">Couldn't complete that. Please try again</string>
+    <string name="home_map_widget_searching_for_jobs">Searching for jobs nearby</string>
+    <string name="home_map_widget_logout_cta">Logout</string>
+    <string name="home_map_widget_logout_shift_ends_template">Shift ends at {time}</string>
+    <string name="home_map_widget_dismiss_helper">Dismiss</string>
+    <string name="home_map_widget_lunch_time">Lunch time</string>
+    <string name="home_map_widget_lunch_in_template">Lunch in {time}</string>
+    <string name="home_lunch_time_left_label">TIME LEFT</string>
+    <string name="home_lunch_starting_in_label">LUNCH STARTING IN</string>
+    <string name="home_lunch_end_break_cta">End Break &amp; Start Earning</string>
+    <string name="home_lunch_request_title">Do you want to take your lunch break?</string>
+    <string name="home_lunch_take_break_cta">Yes</string>
+    <string name="home_lunch_skip_break_cta">Not yet</string>
+    <string name="home_lunch_end_confirm_title">Are you sure you want to end the break?</string>
+    <string name="home_lunch_end_confirm_primary_cta">End Break</string>
+    <string name="home_lunch_end_confirm_secondary_cta">Go Back</string>
+    <string name="home_see_you_tomorrow_title">See you tomorrow!</string>
+    <string name="home_see_you_tomorrow_refer_cta">Refer and Earn</string>
+</resources>

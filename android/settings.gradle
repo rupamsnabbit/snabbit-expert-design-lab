@@ -1,0 +1,69 @@
+pluginManagement {
+    def flutterSdkPath = {
+        def properties = new Properties()
+        file("local.properties").withInputStream { properties.load(it) }
+        def flutterSdkPath = properties.getProperty("flutter.sdk")
+        assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
+        return flutterSdkPath
+    }()
+
+    includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
+
+    repositories {
+        def propertiesFile = new File(rootProject.projectDir, "local.properties")
+        def properties = new Properties()
+        properties.load(new FileInputStream(propertiesFile))
+        def SDKToken = properties.getProperty("AXML_SDK_TOKEN")
+        def SDKUrl = properties.getProperty("AXML_SDK_URL")
+
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+        // Perfios AadhaarXML SDK — repository-scoped Bitbucket Access Token sent as an
+        // "Authorization: Bearer" header (see android/build.gradle for the full note).
+        if (SDKUrl?.trim()) {
+            maven {
+                url = SDKUrl
+                credentials(HttpHeaderCredentials) {
+                    name = "Authorization"
+                    value = "Bearer " + (SDKToken ?: "")
+                }
+                authentication {
+                    header(HttpHeaderAuthentication)
+                }
+            }
+        }
+    }
+}
+
+plugins {
+    id "dev.flutter.flutter-plugin-loader" version "1.0.0"
+    // AGP 8.10.1 (release is on 8.9.1): required by KSP2 (com.google.devtools.ksp
+    // 2.3.x for Kotlin 2.3.20), whose minimum supported AGP is 8.10.0. :shared keeps
+    // Room — hence KSP — which release dropped, so release could stay on 8.9.1.
+    id "com.android.application" version '8.10.1' apply false
+    id "com.android.library" version '8.10.1' apply false
+    // START: FlutterFire Configuration
+    id "com.google.gms.google-services" version "4.4.3" apply false
+    id "com.google.firebase.crashlytics" version "3.0.2" apply false
+    // END: FlutterFire Configuration
+    id "org.jetbrains.kotlin.android" version "2.3.20" apply false
+    id "org.jetbrains.kotlin.multiplatform" version "2.3.20" apply false
+    id "org.jetbrains.kotlin.plugin.compose" version "2.3.20" apply false
+    id "org.jetbrains.kotlin.plugin.serialization" version "2.3.20" apply false
+    id "org.jetbrains.compose" version "1.11.1" apply false
+    id "app.cash.sqldelight" version "2.2.1" apply false
+}
+
+include ":app"
+include ":shared"
+project(":shared").projectDir = file("../shared")
+
+// Mirrors shared/settings.gradle.kts: the published artifact is the consumption path; opt in with
+// `kavach.useLocal=true` to build the sibling safety-kavach checkout in place while iterating on it.
+def kavachLocal = file("../../safety-kavach")
+if (providers.gradleProperty("kavach.useLocal").orNull == "true" &&
+    new File(kavachLocal, "settings.gradle.kts").exists()) {
+    includeBuild(kavachLocal)
+    logger.lifecycle("Kavach: building com.safetykavach:shield from ${kavachLocal.canonicalPath}")
+}

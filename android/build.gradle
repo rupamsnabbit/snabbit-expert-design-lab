@@ -1,0 +1,118 @@
+// allprojects {
+//     repositories {
+//         google()
+//         mavenCentral()
+//     }
+// }
+
+
+// rootProject.buildDir = "../build"
+// subprojects {
+//     project.buildDir = "${rootProject.buildDir}/${project.name}"
+// }
+// subprojects {
+//     project.evaluationDependsOn(":app")
+// }
+
+// tasks.register("clean", Delete) {
+//     delete rootProject.buildDir
+// }
+
+allprojects {
+
+    def localProperties = new Properties()
+    localProperties.load(new FileInputStream(rootProject.file("local.properties")))
+
+    repositories {
+        // mavenLocal is opt-in (local.properties: useMavenLocal=true) so a locally-published
+        // design-system (publishToMavenLocal) can be tested before a real release WITHOUT a
+        // stale local artifact silently shadowing the released GitHub Packages copy in
+        // committed / CI builds. Absent the flag, released artifacts always win.
+        if (localProperties['useMavenLocal'] == 'true') {
+            mavenLocal()
+        }
+        google()
+        jcenter()
+        maven { url "https://jitpack.io" }
+
+        // Perfios AadhaarXML SDK, hosted on Bitbucket. Auth is a repository-scoped
+        // Access Token sent as an "Authorization: Bearer" header. It replaces the
+        // Bitbucket App Password (basic auth) that Atlassian retires end of July 2026
+        // — brownouts already break resolution intermittently before then.
+        // local.properties: AXML_SDK_URL + AXML_SDK_TOKEN (the trailing space after
+        // "Bearer" is required).
+        if (localProperties['AXML_SDK_URL']?.trim()) {
+            maven {
+                url localProperties['AXML_SDK_URL']
+                credentials(HttpHeaderCredentials) {
+                    name = "Authorization"
+                    value = "Bearer " + (localProperties['AXML_SDK_TOKEN'] ?: "")
+                }
+                authentication {
+                    header(HttpHeaderAuthentication)
+                }
+            }
+        }
+
+        // Snabbit Design System (Compose Multiplatform) on GitHub Packages.
+        // Auth: ~/.gradle/gradle.properties (gpr.user / gpr.token) OR
+        //       GITHUB_ACTOR + GITHUB_TOKEN env vars (CI fallback).
+        // PAT must have read:packages scope.
+        maven {
+            url "https://maven.pkg.github.com/snabbit-tech/snabbit-design-system"
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+
+        // Safety Kavach (com.safetykavach:shield) on GitHub Packages. Same auth as
+        // the DS repo above (gpr.user/gpr.token OR GITHUB_ACTOR/GITHUB_TOKEN, read:packages).
+        // Consumed by :shared once the local includeBuild in settings.gradle is disabled.
+        maven {
+            url "https://maven.pkg.github.com/snabbit-tech/safety-kavach-kmp"
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+
+// Android 16KB page-size compatibility.
+// The scout_flutter plugin ships a CMake-built native lib (libscout_crash_handler.so) and
+// pins no ndkVersion, so it resolves to NDK r27 (default ELF max-page-size = 4KB / 0x1000)
+// and fails to load on 16KB-page devices. Pin it to the app's NDK r28 (which defaults to
+// 16KB alignment) and explicitly opt into flexible page sizes so the flag also holds if the
+// resolved NDK ever regresses. Scoped to scout_flutter only; every other .so is already
+// >= 16KB aligned. Uses plugins.withId (fires as the Android plugin is applied) rather than
+// afterEvaluate, which the evaluationDependsOn(':app') hook below would run too late for.
+subprojects {
+    plugins.withId('com.android.library') {
+        if (project.name == 'scout_flutter') {
+            android {
+                ndkVersion = "28.2.13676358"
+                defaultConfig {
+                    externalNativeBuild {
+                        cmake {
+                            arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

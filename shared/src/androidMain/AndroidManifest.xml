@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Library manifest for :shared. AppsFlyer SDK needs INTERNET +
+  ACCESS_NETWORK_STATE; AD_ID is recommended for attribution quality.
+  See docs/KMP_ANALYTICS_MODULE_LLD.md §5.7 / §16.2.
+
+  INTERNET and ACCESS_NETWORK_STATE are also declared in
+  android/app/src/main/AndroidManifest.xml — manifest merger deduplicates.
+
+  Realtime (MQTT state sync, docs/mqtt-state-sync-lld.html):
+  - SnabbitForegroundService is typed foregroundServiceType="location". It hosts the
+    MQTT realtime socket today and will absorb the periodic location→backend upload
+    when the Flutter flutter_background_service location FGS is retired. It reuses the
+    app manifest's already-declared (and Play-accepted) FOREGROUND_SERVICE_LOCATION
+    permission, so it needs no separate Play FGS declaration. WAKE_LOCK backs the
+    time-boxed partial wakelock held around connect/subscribe (LLD §5.6); the base
+    FOREGROUND_SERVICE permission is in the app manifest.
+  - NOT dataSync: at targetSdk 35 Android 15 force-stops a dataSync FGS after ~6h/24h
+    (would drop the socket mid-shift), and Play's dataSync category is finite
+    data-transfer, not a persistent dispatch socket. The FGS start is guarded on
+    location permission in RealtimePlugin.startService() — a location-typed FGS throws
+    on start without it (Android 14+).
+  - The service is exported="false" here; the app's DEBUG manifest overrides
+    it to exported="true" so the WS0 soak scripts can drive it over adb.
+    Release builds keep it non-exported.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application>
+        <service
+            android:name="com.snabbit.runner.shared.core.background.SnabbitForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="location" />
+    </application>
+</manifest>

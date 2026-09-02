@@ -1,0 +1,11 @@
+flutter_native_splash:
+  color: "#F70F79"
+  image: assets/pngs/snabbit_expert_icon.png
+  android: true
+  ios: false
+  web: false
+  android_12:
+    color: "#F70F79"
+    image: assets/pngs/snabbit_expert_icon.png
+
+# dart run flutter_native_splash:create --path=flutter_native_splash.yaml

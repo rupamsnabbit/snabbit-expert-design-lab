@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Back: the returning surface slides in from the left as the current one leaves to
+     the right (reverse of the forward slide). Full-width so the pair stays edge-adjacent
+     and nothing underneath (e.g. the Flutter home) peeks through the gap. -->
+<translate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="280"
+    android:fromXDelta="-100%p"
+    android:toXDelta="0"
+    android:interpolator="@android:anim/decelerate_interpolator" />

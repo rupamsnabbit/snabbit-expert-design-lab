@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Kavach feature — default fallback labels (server may override at runtime).
+     Keys are globally unique and feature-prefixed (kavach_ / sos_). -->
+<resources>
+    <!-- Kavach card -->
+    <string name="kavach_title">Snabbit Kavach</string>
+    <string name="kavach_activate">Activate</string>
+    <string name="kavach_sos">SOS</string>
+
+    <!-- Consent sheet -->
+    <string name="kavach_consent_intro">Introducing</string>
+    <string name="kavach_consent_stay_protected_title">Stay Protected</string>
+    <string name="kavach_consent_stay_protected_body">Turn on Snabbit Kavach if you feel unsafe</string>
+    <string name="kavach_consent_monitoring_title">Smart Monitoring</string>
+    <string name="kavach_consent_monitoring_body">Audio &amp; location will be used to protect you</string>
+    <string name="kavach_consent_sos_title">SOS</string>
+    <string name="kavach_consent_sos_body">Tap SOS anytime for immediate help</string>
+    <string name="kavach_consent_terms">By continuing, you agree to the updated Terms &amp; Conditions</string>
+    <string name="kavach_consent_agree">Yes, I agree</string>
+
+    <!-- Keep-phone sheet -->
+    <string name="kavach_keep_phone_title">Always keep your phone with you</string>
+    <string name="kavach_keep_phone_body">Snabbit Kavach helps keep you safe using your phone's audio and location</string>
+    <string name="kavach_keep_phone_cta">Got it</string>
+
+    <!-- Battery-low sheet -->
+    <string name="kavach_battery_low_title">Battery is running low</string>
+    <string name="kavach_battery_low_body">Please charge your phone to keep Snabbit Kavach active.</string>
+    <string name="kavach_battery_low_cta">Understood</string>
+
+    <!-- No-storage status pill -->
+    <string name="kavach_no_storage">No storage available. Clear space to continue.</string>
+
+    <!-- Activation / consent failure (transient snackbar) -->
+    <string name="kavach_activation_error">Couldn't turn on Snabbit Kavach. Please try again.</string>
+
+    <!-- Permission dialog (shown when activation is blocked on mic/location) -->
+    <string name="kavach_permission_title">Allow audio &amp; location</string>
+    <string name="kavach_permission_denied_body">Snabbit Kavach needs microphone and location access to keep you safe. Please allow them to turn on protection.</string>
+    <string name="kavach_permission_settings_body">Microphone and location are blocked. Open Settings to allow them, then return to turn on protection.</string>
+    <string name="kavach_permission_retry">Try again</string>
+    <string name="kavach_permission_settings">Open settings</string>
+    <string name="kavach_permission_not_now">Not now</string>
+
+    <!-- SOS alert sheet (shown while a raised SOS awaits confirm/deny) -->
+    <string name="kavach_sos_alert_title">Are you in danger?</string>
+    <string name="kavach_sos_alert_confirm">I am in danger</string>
+    <string name="kavach_sos_alert_deny">I am safe</string>
+
+    <!-- SOS active screen -->
+    <string name="sos_help_title">Help is on the way.</string>
+    <string name="sos_help_subtitle">Move to a safe place.</string>
+    <string name="sos_call_team">Call SOS Team</string>
+    <string name="sos_mark_safe">I am safe, end SOS</string>
+    <string name="sos_action_error">Couldn't complete that. Please try again.</string>
+</resources>

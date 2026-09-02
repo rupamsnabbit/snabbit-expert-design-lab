@@ -1,0 +1,6 @@
+{
+  "event": "callPhone",
+  "data": {
+    "phoneNumber": "+91 98765 43210"
+  }
+}

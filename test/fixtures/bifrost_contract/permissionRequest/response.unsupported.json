@@ -1,0 +1,22 @@
+{
+  "event": "permissionRequest",
+  "requestId": "01JA0000PERM00000000000002",
+  "error": {
+    "code": "INVALID_ARGS",
+    "message": "Unsupported permission: bluetooth",
+    "details": {
+      "requested": "bluetooth",
+      "supported": [
+        "camera",
+        "location",
+        "locationWhenInUse",
+        "locationAlways",
+        "photos",
+        "microphone",
+        "notifications",
+        "contacts",
+        "storage"
+      ]
+    }
+  }
+}

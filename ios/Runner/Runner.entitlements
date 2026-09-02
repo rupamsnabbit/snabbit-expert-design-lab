@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  Critical Alerts — lets the Kavach SOS notification (UNNotificationSound.defaultCriticalSound)
+	  pierce silent mode / the ringer switch / Focus-DND and play at the system critical-alert
+	  volume (the only iOS lever to be loud-when-muted; apps cannot raise system volume directly).
+
+	  NOT ACTIVE until BOTH steps are done — leaving this file UNREFERENCED in the pbxproj keeps
+	  the build safe (adding CODE_SIGN_ENTITLEMENTS before approval breaks device/distribution
+	  signing: the provisioning profile won't carry this entitlement):
+
+	    1. Get Apple approval — apply at
+	       https://developer.apple.com/contact/request/notifications-critical-alerts-entitlement/
+	       then regenerate the provisioning profile so it includes the entitlement.
+	    2. Wire it into the Runner target in Xcode:
+	       Signing & Capabilities → + Capability → Critical Alerts
+	       (sets Build Settings → Code Signing Entitlements = Runner/Runner.entitlements).
+
+	  The app already REQUESTS the permission (criticalAlert: true in
+	  lib/widgets/notification_permission_service.dart) — it only takes effect once the above lands.
+	-->
+	<key>com.apple.developer.usernotifications.critical-alerts</key>
+	<true/>
+</dict>
+</plist>

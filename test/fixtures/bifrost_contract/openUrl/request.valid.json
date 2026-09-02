@@ -1,0 +1,6 @@
+{
+  "event": "openUrl",
+  "data": {
+    "url": "https://maps.google.com/?q=12.97,77.59"
+  }
+}

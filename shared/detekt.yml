@@ -1,0 +1,53 @@
+# detekt — guardrails for the build-screen standard (.claude/skills/build-screen).
+#
+# Only ForbiddenImport is active (shared/build.gradle.kts sets
+# buildUponDefaultConfig = false), so this is a focused guardrail, not a full
+# style pass. It enforces the three hard rules by banning the material3 / raw
+# primitives that have Snabbit Design System equivalents.
+#
+# Escape hatch: a justified one-off may use `@Suppress("ForbiddenImport")` on the
+# import — but prefer flagging a missing DS component over suppressing.
+
+build:
+  maxIssues: 0
+
+style:
+  ForbiddenImport:
+    active: true
+    # The design-system layer (core/designsystem) is the sanctioned home for
+    # material3 chrome primitives and raw Color — it builds the DS shims on top
+    # of com.snabbit.design. Everything under features/ must use SnabbitScreen +
+    # SnabbitTheme tokens instead.
+    excludes: ['**/core/designsystem/**']
+    imports:
+      # Rule 1 — wrap screens in SnabbitScreen (don't hand-roll chrome).
+      - value: 'androidx.compose.material3.MaterialTheme'
+        reason: 'Use SnabbitTheme (com.snabbit.design.theme). See .claude/skills/build-screen.'
+      - value: 'androidx.compose.material3.Scaffold'
+        reason: "Don't hand-roll chrome — wrap the screen in SnabbitScreen (com.snabbit.runner.shared.ui)."
+      - value: 'androidx.compose.material3.TopAppBar'
+        reason: 'Use SnabbitScreen(title =, onNavigateUp =) — it renders SnabbitTopNav.'
+      - value: 'androidx.compose.material3.CenterAlignedTopAppBar'
+        reason: 'Use SnabbitScreen.'
+      # Rule 3 — DS components only for visible UI.
+      - value: 'androidx.compose.material3.Text'
+        reason: 'Use SnabbitText (com.snabbit.design.atoms).'
+      - value: 'androidx.compose.material3.Button'
+        reason: 'Use SnabbitButton.'
+      - value: 'androidx.compose.material3.OutlinedButton'
+        reason: 'Use SnabbitButton.'
+      - value: 'androidx.compose.material3.TextButton'
+        reason: 'Use SnabbitButton.'
+      - value: 'androidx.compose.material3.ElevatedButton'
+        reason: 'Use SnabbitButton.'
+      - value: 'androidx.compose.material3.FilledTonalButton'
+        reason: 'Use SnabbitButton.'
+      - value: 'androidx.compose.material3.Card'
+        reason: 'Use SnabbitCard / SnabbitSelectionCard.'
+      - value: 'androidx.compose.material3.OutlinedCard'
+        reason: 'Use SnabbitCard.'
+      - value: 'androidx.compose.material3.ElevatedCard'
+        reason: 'Use SnabbitCard.'
+      # Rule 2 — design tokens only, no raw colors.
+      - value: 'androidx.compose.ui.graphics.Color'
+        reason: 'No raw colors — use SnabbitTheme.colors.* tokens.'

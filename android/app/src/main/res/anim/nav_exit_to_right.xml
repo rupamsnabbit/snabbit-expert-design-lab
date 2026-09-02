@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Back: the current surface slides fully off to the right, revealing the returning
+     surface entering from the left. Full-width so the pair covers the screen throughout. -->
+<translate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="280"
+    android:fromXDelta="0"
+    android:toXDelta="100%p"
+    android:interpolator="@android:anim/decelerate_interpolator" />

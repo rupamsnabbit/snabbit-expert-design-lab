@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug-only shadow of the OTPless AAR's network_security_config (same resource
+  name → debug source set wins over the library AAR). Carries the 4 OTPless
+  cleartext domains forward, plus stg.snabbit.net for the staging ephemeral env
+  that doesn't serve TLS. Release builds keep using the OTPless AAR's config
+  unmodified (no cleartext for stg).
+-->
+<network-security-config>
+    <!--
+      QA network debugging (Charles / Proxyman / mitmproxy): trust user-installed
+      CA certs so QA can MITM-inspect HTTPS on debug builds. This whole file lives
+      in src/debug, so it NEVER ships in release — release builds use the OTPless
+      AAR's network_security_config unmodified (system CAs only, no user trust).
+      Covers OkHttp/Ktor (KMP), WebViews and native HTTP; Dart/Dio is handled
+      separately (it ignores this config) via QaProxyHttpOverrides.
+    -->
+    <base-config>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">80.in.safr.sekuramobile.com</domain>
+        <domain includeSubdomains="true">partnerapi.jio.com</domain>
+        <domain includeSubdomains="true">in-vil.ipification.com</domain>
+        <domain includeSubdomains="true">api-csp.airtel.in</domain>
+        <domain includeSubdomains="true">stg.snabbit.net</domain>
+    </domain-config>
+</network-security-config>

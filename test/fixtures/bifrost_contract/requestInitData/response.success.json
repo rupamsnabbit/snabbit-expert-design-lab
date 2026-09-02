@@ -1,0 +1,28 @@
+{
+  "event": "requestInitData",
+  "requestId": "01J9Z2P8K9VXRY4QC3H6B1M7W2",
+  "data": {
+    "token": "eyJhbGciOi...redacted",
+    "appVersion": "2.3.0",
+    "buildNumber": "145",
+    "platform": "android",
+    "osVersion": "14",
+    "deviceManufacturer": "Google",
+    "deviceModel": "Pixel 8",
+    "runner": {
+      "id": "runner_123",
+      "name": "Test Runner",
+      "languagePreference": "en",
+      "phoneNumber": "9876543210",
+      "countryCode": "+91",
+      "serviceId": 7,
+      "tier": "GOLD",
+      "clusterId": 3,
+      "regionId": 1,
+      "status": "ACTIVE",
+      "onDuty": true,
+      "isActive": true
+    },
+    "capabilities": ["navigate", "trackEvent"]
+  }
+}

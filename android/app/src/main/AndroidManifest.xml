@@ -1,0 +1,220 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.snabbit.runner"
+    xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCESSIBILITY"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Chromium's media layer needs BOTH of these before the WebView will
+         open a mic for getUserMedia; with RECORD_AUDIO alone it logs
+         "No audio device will be available for recording" and getUserMedia
+         fails with NotReadableError. Normal permission, no runtime prompt. -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!-- Locked-device AWOL alert: full-screen-intent notification launching
+         LockScreenAlertActivity (Android 14+ gate: canUseFullScreenIntent()). -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <!-- New-job overlay foreground-service notification (Android 13+) + the FCM notification fallback -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
+    <!-- Camera (for KMP camera module) -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
+    <!-- Recommended so that CleverTap knows when to attempt a network call -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <application
+        android:label="Snabbit Expert"
+        android:name=".SnabbitRunnerApplication"
+        android:icon="@mipmap/ic_launcher"
+        android:networkSecurityConfig="@xml/otpless_network_security_config"
+        android:fullBackupContent="@xml/snabbit_backup_rules"
+        android:dataExtractionRules="@xml/snabbit_data_extraction_rules"
+        tools:replace="android:fullBackupContent,android:dataExtractionRules">
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAz-YH-LJrz4rtufaa_49h3c2ibuToLbBo"/>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="high_importance_channel"/>
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true"
+            android:windowSoftInputMode="adjustResize">
+            <!-- Specifies an Android theme to apply to this Activity as soon as
+                 the Android process has started. This theme is visible to the user
+                 while the Flutter UI initializes. After that, this theme continues
+                 to determine the Window background behind the Flutter UI. -->
+            <meta-data
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme"/>
+            <intent-filter
+                android:autoVerify="true">
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+             <intent-filter>                                                                                                       
+                <action android:name="android.intent.action.VIEW" />                                                              
+                <category android:name="android.intent.category.DEFAULT" />                                                       
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:host="otpless"                                 
+                        android:scheme="otpless.klznupdu4mtaq4uh7esp"/>                                                             
+            </intent-filter> 
+            <intent-filter  android:autoVerify="true">        
+                <action android:name="android.intent.action.VIEW" />        
+                <category android:name="android.intent.category.DEFAULT" />        
+                <category android:name="android.intent.category.BROWSABLE" />        
+                <data android:scheme="https" android:host="snabbitrunner.onelink.me" />      
+            </intent-filter>
+          
+        </activity>
+        <!-- Generic keyguard alert surface: launched by a full-screen-intent
+             notification when the device is locked (setShowWhenLocked +
+             setTurnScreenOn); renders the same OverlaySpec.Content the window
+             host uses. See com.snabbit.runner.overlayhost.LockScreenAlertActivity. -->
+        <activity
+            android:name=".overlayhost.LockScreenAlertActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:excludeFromRecents="true"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/NormalTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" />
+        <!-- Native host for the KMP navigation module (Nav3 Compose screens). -->
+        <activity
+            android:name=".navigation.NavigationHostActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:taskAffinity=""
+            android:enableOnBackInvokedCallback="true"
+            android:theme="@style/NormalTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:windowSoftInputMode="adjustResize" />
+        <!-- Don't delete the meta-data below.
+             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2"/>
+        <!-- Impeller's GLES backend collides with flutter_inappwebview's EGL
+             context ("context current to another thread" → black screen) when a
+             WebView platform view is re-created — e.g. reopening Earnings from the
+             native Profile tab. Skia shares the platform-view EGL context safely.
+             Remove once Impeller + hybrid-composition platform views is fixed upstream. -->
+        <meta-data
+            android:name="io.flutter.embedding.android.EnableImpeller"
+            android:value="false"/>
+        <meta-data
+            android:name="CLEVERTAP_ACCOUNT_ID"
+            android:value="6K9-788-RK7Z"/>
+        <meta-data
+            android:name="CLEVERTAP_TOKEN"
+            android:value="bba-c36"/>
+        <service
+            android:name="id.flutter.flutter_background_service.BackgroundService"
+            android:foregroundServiceType="location|microphone" />
+        <!-- Two references to FlutterFirebaseMessagingService here, doing different jobs:
+
+             1. `<service ... tools:node="remove"/>` below is a *manifest-merger directive*,
+                not a service registration. `firebase_messaging` plugin ships its own manifest
+                that auto-registers FlutterFirebaseMessagingService on MESSAGING_EVENT; we delete
+                that entry at merge time so it doesn't conflict with ours.
+
+             2. In Kotlin, `SnabbitPushService : FlutterFirebaseMessagingService()` extends the
+                same class — we reuse the plugin's Flutter-bridge (background isolate spawn,
+                Dart dispatch) and only override `onMessageReceived` (CleverTap "viewed") and
+                `onNewToken` (killed-state token rotation → CleverTap).
+
+             Runtime = one service registered (ours). We need the manifest override because the
+             CleverTap "viewed" impression has to fire BEFORE the Flutter background isolate
+             takes over — the isolate has no MethodChannel, so Dart can't call CleverTap SDK.
+
+             This whole shape can be deleted once notification rendering moves off Dart
+             (currently `_handleCleverTapPush` in main.dart — see SnabbitPushService.kt's
+             ponytail comment for the exit plan). -->
+        <service
+            android:name="io.flutter.plugins.firebase.messaging.FlutterFirebaseMessagingService"
+            tools:node="remove" />
+        <service
+            android:name=".push.SnabbitPushService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".compose_overlay.service.OverlayService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="overlay_display_for_runner_status"/>
+        </service>
+        <!-- The ONE generic draw-over-other-apps window host. Presents Koin-registered
+             OverlaySpecs (AWOL alert, New Job card) when the app isn't foreground;
+             see com.snabbit.runner.overlayhost.ComposeOverlayHost. -->
+        <service
+            android:name=".overlayhost.ComposeOverlayHost"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="runner_alert_overlay_over_other_apps"/>
+        </service>
+        <service android:name="com.clevertap.android.sdk.pushnotification.fcm.FcmMessageListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+    </application>
+    <!-- Required to query activities that can process text, see:
+         https://developer.android.com/training/package-visibility and
+         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+
+         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
+    <queries>
+        <intent>
+            <action
+                android:name="android.intent.action.TTS_SERVICE"/>
+        </intent>
+        <intent>
+            <action
+                android:name="android.intent.action.PROCESS_TEXT"/>
+            <data
+                android:mimeType="text/plain"/>
+        </intent>
+        
+        <!-- Query for installed apps -->
+        <package
+            android:name="com.urbanclap.provider"/>
+        <package
+            android:name="com.company.prontopartner"/>
+    </queries>
+</manifest>

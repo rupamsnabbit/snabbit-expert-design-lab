@@ -1,0 +1,10 @@
+{
+  "event": "trackEvent",
+  "data": {
+    "name": "rate_card_opened",
+    "properties": {
+      "source": "drawer",
+      "tier": "gold"
+    }
+  }
+}

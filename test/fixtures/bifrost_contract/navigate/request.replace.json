@@ -1,0 +1,8 @@
+{
+  "event": "navigate",
+  "data": {
+    "uri": "snabbit://add-bank-upi",
+    "closeBehavior": "replace"
+  },
+  "requestId": "01J9Z3NAV8Q0000000000000V2"
+}

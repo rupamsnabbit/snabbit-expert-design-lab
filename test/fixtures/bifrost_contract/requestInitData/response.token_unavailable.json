@@ -1,0 +1,8 @@
+{
+  "event": "requestInitData",
+  "requestId": "01J9Z2P8K9VXRY4QC3H6B1M7W2",
+  "error": {
+    "code": "TOKEN_UNAVAILABLE",
+    "message": "Access token is not available in secure storage."
+  }
+}

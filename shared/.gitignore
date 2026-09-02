@@ -1,0 +1,3 @@
+# KMP :shared module build outputs & Gradle cache — never source
+/build/
+/.gradle/

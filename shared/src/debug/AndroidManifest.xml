@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug-only manifest for :shared, used solely when :shared builds its OWN test APK
+  (Robolectric / instrumented). :shared bundles both Grant and AppsFlyer, which each declare
+  <application> android:fullBackupContent + android:dataExtractionRules; with no host app to
+  arbitrate, :shared's auto-generated test <application> hits a merge collision. Resolve it here
+  by picking AppsFlyer's rules (arbitrary — test APK backup behaviour is irrelevant).
+
+  This is scoped to :shared's debug source set, so it does NOT propagate to the app build —
+  the app owns the real backup policy via @xml/snabbit_* + tools:replace in its own manifest.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application
+        android:fullBackupContent="@xml/appsflyer_backup_rules"
+        android:dataExtractionRules="@xml/appsflyer_data_extraction_rules"
+        tools:replace="android:fullBackupContent,android:dataExtractionRules" />
+</manifest>

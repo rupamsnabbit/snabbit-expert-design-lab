@@ -1,0 +1,7 @@
+{
+  "event": "closeWebView",
+  "data": {
+    "purchased": true,
+    "orderId": "ord_12345"
+  }
+}

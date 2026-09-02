@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Forward: the incoming surface slides in from the right edge to fill the screen.
+     Full-width (100%p) so it stays edge-adjacent with the outgoing surface (no gap
+     that would reveal what's underneath). -->
+<translate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="280"
+    android:fromXDelta="100%p"
+    android:toXDelta="0"
+    android:interpolator="@android:anim/decelerate_interpolator" />

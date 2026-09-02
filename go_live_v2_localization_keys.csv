@@ -1,0 +1,47 @@
+Key,Default Message
+go_live_v2_cluster_min_selection_error,Please select at least 2 work areas
+go_live_v2_cluster_title,Select top 3 work areas
+go_live_v2_loading_work_areas,Loading work areas...
+go_live_v2_cluster_load_failed,Failed to load work areas
+go_live_v2_retry,Retry
+go_live_v2_higher_earnings,Higher earnings
+go_live_v2_cluster_helper_text,You can select up to 3 areas
+go_live_v2_continue,Continue
+go_live_v2_select_shift_hours_error,Please select shift hours
+go_live_v2_error_occurred,An error occurred: $e
+go_live_v2_shift_hours_title,Select your shift hours
+go_live_v2_weekend_shift_hours_title,Select your weekend shift hours
+go_live_v2_total_hours_work,Total hours of work
+go_live_v2_potential_earnings,Potential earnings = ₹${bucket.potentialEarningsFormatted}
+go_live_v2_select_shift_start_time_error,Please select shift start time
+go_live_v2_shift_start_time_title,Select your shift start time
+go_live_v2_weekend_shift_start_time_title,Select your weekend shift start time
+go_live_v2_verification_failed,Verification failed
+go_live_v2_recommendations_title,Go Live now
+go_live_v2_choose_weekend_shift,Choose your weekend shift
+go_live_v2_finding_best_shift,Finding your best shift...
+go_live_v2_recommendations_load_failed,Failed to load recommendations
+go_live_v2_go_live_weekend,Go Live on Weekend
+go_live_v2_all_options_exhausted,All your options are exhausted.
+go_live_v2_go_back_begin_again,Please go back and begin again
+go_live_v2_start_again,Start Again
+go_live_v2_edit_preferences,Edit your preferences
+go_live_v2_estimated_monthly_earnings,Estimated Monthly Earnings
+go_live_v2_extra_weekend_bonus,Extra Weekend Bonus
+go_live_v2_joining_bonus,Joining Bonus
+go_live_v2_top_shift_bonus,Top Shift Bonus
+go_live_v2_top_shift,Top Shift
+go_live_v2_confirmation_failed,Confirmation failed
+go_live_v2_confirm_shift_timings,Confirm your shift timings
+go_live_v2_start_time_end_time,Start time - End time
+go_live_v2_shift_hour,Shift Hour
+go_live_v2_confirm,Confirm
+go_live_v2_go_back,Go Back
+go_live_v2_weekend_earnings_title,Do you want to earn more on Saturday & Sunday?
+go_live_v2_yes,Yes
+go_live_v2_no,No
+go_live_v2_okay,Okay
+go_live_v2_no_slots_available,No slots available as per your preference
+go_live_v2_go_back_change_preferences,Please go back and change your preferences.
+go_live_v2_slot_unavailable,This slot is unavailable
+go_live_v2_choose_another,Please choose another

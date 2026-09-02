@@ -1,0 +1,6 @@
+{
+  "event": "trackEvent",
+  "data": {
+    "properties": {"foo": "bar"}
+  }
+}

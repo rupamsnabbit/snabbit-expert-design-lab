@@ -1,0 +1,6 @@
+{
+  "event": "openUrl",
+  "data": {
+    "url": "javascript:alert(1)"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "skill": "build-feature",
+  "evals": [
+    {
+      "name": "trigger-build-new-feature",
+      "category": "trigger-positive",
+      "prompt": "Build a new referral feature in the shared module.",
+      "assertions": [
+        "The build-feature skill is loaded",
+        "Stops at GATE 1 to confirm scope before creating any file",
+        "Reads core-facts, feature-template, platform-rules, library-guide, and component-catalog first"
+      ]
+    },
+    {
+      "name": "trigger-add-screen",
+      "category": "trigger-positive",
+      "prompt": "Add a screen to the existing shift feature.",
+      "assertions": [
+        "The build-feature skill is loaded in `screen` mode",
+        "Skips the Koin + navigation gate (GATE 5)"
+      ]
+    },
+    {
+      "name": "trigger-negative-review",
+      "category": "trigger-negative",
+      "prompt": "Review my KMP changes before I open a PR.",
+      "assertions": [
+        "The build-feature skill is NOT loaded",
+        "Routed to the review-changes skill instead"
+      ]
+    },
+    {
+      "name": "functional-scaffold-feature",
+      "category": "functional",
+      "prompt": "Scaffold a new `payout-summary` feature (new mode) that shows the monthly payout with loading and error states.",
+      "assertions": [
+        "Stops at GATE 1 for scope confirmation; creates no file unprompted",
+        "Plan uses the feature-first layout per cmp-architecture-structure (ui/{contracts,viewmodel,screens} + data/ + di/); domain/ only with explicit justification",
+        "ViewModel extends androidx.lifecycle.ViewModel and uses viewModelScope only (no injected CoroutineScope)",
+        "Screen wrapped in SnabbitScreen; DS components + tokens only; collectAsStateWithLifecycle()",
+        "UiState list fields are ImmutableList; errors mapped to AppErrorType; one-shot effects per D2",
+        "Verifies with :shared:testDebugUnitTest and :shared:compileTestKotlinIosArm64"
+      ]
+    }
+  ]
+}

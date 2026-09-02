@@ -1,0 +1,311 @@
+name: snabbit_runner
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 3.0.9+174
+
+environment:
+  sdk: ">=3.4.1 <4.0.0"
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.6
+  shared_preferences: ^2.2.3
+  provider: ^6.1.2
+  pinput: ^5.0.0
+  http: ^1.2.1
+  flutter_svg: ^2.1.0
+  google_maps_flutter: ^2.7.0
+  location: ^8.0.1
+  geolocator: ^14.0.2
+  flutter_screenutil: ^5.9.3
+  intl: ^0.20.2
+  dio: ^5.4.3+1
+  # Debug-only HTTP inspector (Chucker Android port). Wired only behind
+  # kDebugMode in lib/services/debug/network_inspector.dart, and the package
+  # itself defaults to showOnRelease=false, so it never runs and is
+  # tree-shaken out of profile/release builds. See that file for the gate.
+  chucker_flutter: ^1.9.2
+  sms_autofill: ^2.4.0
+  otpless_headless_flutter: ^1.0.4
+  flutter_pdfview: ^1.3.2
+  path_provider: ^2.1.3
+  logger: ^2.3.0
+  # awesome_ripple_animation: ^2.0.0
+  url_launcher: ^6.3.0
+  crypto: ^3.0.7
+  flutter_inappwebview: ^6.1.5
+  flutter_animate: ^4.5.0
+  permission_handler: ^12.0.1
+  action_slider: ^0.7.0
+  flutter_rating_bar: ^4.0.1
+  # TODO(firebase-unpin): pinned to the last coherent FlutterFire train — the 4.12.0/5.2.5 train
+  # references `FirebasePlugin` which firebase_core_platform_interface 7.1.0 doesn't provide (upstream
+  # desync). Restore ^ ranges once FlutterFire ships a coherent train.
+  firebase_core: 4.11.0
+  firebase_analytics: 12.4.3
+  firebase_messaging: 16.4.1
+  device_info_plus: ^12.1.0
+  android_id: ^0.5.1
+  uuid: ^4.0.0
+  disk_space_2: ^1.0.12
+  flutter_local_notifications: ^19.4.2
+  vibration: ^3.1.4
+  audioplayers: ^6.0.0
+  format: ^1.5.2
+  flutter_volume_controller: ^1.3.2
+  flutter_launcher_icons: ^0.14.4
+  connectivity_plus: ^7.0.0
+  flutter_tts: ^4.0.2
+  flutter_background_service: ^5.0.10
+  carousel_slider: ^5.1.1
+  package_info_plus: ^9.0.0
+  flutter_contacts: ^1.1.9+2
+  battery_plus: ^7.0.0
+  fluttertoast: ^9.0.0
+  dotted_line: ^3.2.3
+  share_plus: ^12.0.0
+  video_player: ^2.9.3
+  chewie: ^1.10.0
+  flutter_staggered_grid_view: ^0.7.0
+  firebase_crashlytics: 5.2.4 # firebase-unpin (see firebase_core note)
+  firebase_performance: 0.11.4+3 # firebase-unpin
+  cx_flutter_plugin: ^0.0.5
+  # base14 Scout — OpenTelemetry RUM. Coexists with Coralogix; gated behind
+  # the expert_enable_base14_monitoring Remote Config kill-switch.
+  scout_flutter: ^0.1.23
+  open_filex: ^4.7.0
+  image_picker: ^1.1.2
+  lottie: ^3.2.0
+  cached_network_image: ^3.4.1
+  camera: ^0.11.2+1
+  record: ^6.1.2
+  sqflite: ^2.4.2
+  pointycastle: ^4.0.0
+  asn1lib: ^1.5.8
+  shorebird_code_push: ^2.0.5
+  firebase_remote_config: 6.5.3 # firebase-unpin
+  comm_stream:
+    git:
+      url: git@github.com:snabbit-tech/snabbit-comm.git
+      path: packages/comm_stream
+      ref: p2p-chat-no-video
+  #  installed_apps: ^1.3.1
+  network_info_plugin:
+    git:
+      url: git@github.com:snabbit-tech/app-packages.git
+      path: packages/network_info_plugin
+      ref: feature/network-info-plugin
+  hybrid_flutter:
+    git:
+      url: https://x-token-auth:ATCTT3xFfGN0YHcLshyRdO6f8CcVPi-HJEZAm-WcSCkrGea0agKgfjb1cVmVXHa8kPacYWyj9_aUoNhaMpG_nfOW-3soAIXZeB2LaOphGRHiZt4mlKZtI4XQsJGIbpuxJg4nTYr4LJh0thwo8nuUt2huyDpXk05KFmINc2y93Ug31Ya-eos-i6E%3D3D3A0925@bitbucket.org/cross-platform-plugins/flutter_hybrid_plugin.git
+      ref: 1.0.6
+  safety_shield:
+    git:
+      url: git@github.com:snabbit-tech/safety-shield.git
+      ref: v1.0.0
+  flutter_secure_storage: ^10.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^5.0.0
+
+  # Testing dependencies
+  #
+  # Version coupling — DO NOT bump these blindly (see pigeon below):
+  #   pigeon 27 needs analyzer >=10 <13  →  mockito must stay 5.6.4 (5.6.5/5.7.0
+  #   require analyzer ^13, which conflicts). build_runner is capped <2.14.0 because
+  #   2.14.0+ AOT-compiles its build script by default, which fails on Dart 3.10.7
+  #   with "'dart compile' does not support build hooks" (dart-lang/sdk#62593, still
+  #   open). 2.13.1 is JIT-default and supports analyzer 12, so codegen needs no flag.
+  mockito: ^5.6.4
+  build_runner: ">=2.4.13 <2.14.0"
+  flutter_native_splash: ^2.4.1
+
+  # Pigeon — type-safe platform-channel codegen for the KMP navigation bridge
+  # (method channel @HostApi + event channel @EventChannelApi). Source of truth:
+  # pigeons/navigation_api.dart; generated code is committed (see PigeonOptions).
+  # See the version-coupling note above before bumping (pigeon ↔ mockito ↔ analyzer).
+  pigeon: ^27.1.0
+#
+#dependency_overrides:
+#  flutter_volume_controller:
+#    path: ../flutter_volume_controller
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  image_path: "assets/icon/icon.png"
+
+flutter:
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/upload_file.png
+    - assets/cancel.svg
+    - assets/See_you_tomorrow_filled.png
+    - assets/error_page.png
+    - assets/search.png
+    - assets/verification.png
+    - assets/pngs/map_marker.png
+    - assets/pngs/language_icon_filled.png
+    - assets/pngs/custom_progress_bar_reward.png
+    - assets/pngs/lunch_icon.png
+    - assets/pngs/referral_home_graphic.png
+    - assets/pngs/referral_currency.png
+    - assets/pngs/wa_icon.png
+    - assets/pngs/low_battery_warning.png
+    - assets/pngs/
+    - assets/keys/
+    - assets/svgs/
+    - assets/svgs/customer_rating/
+    - assets/gifs/
+    - assets/svgs/drawer/refer_and_earn.svg
+    - assets/referral_banner.gif
+    - assets/referral_page_bg.png
+    - assets/pngs/verification_status/
+    - assets/pngs/payout/
+    - assets/pngs/tier/
+    - assets/notification_sounds/
+    - assets/notification_sounds/en/
+    - assets/notification_sounds/hi/
+    - assets/notification_sounds/mr/
+    - assets/notification_sounds/ka/
+    - assets/notification_sounds/te/
+    - assets/audio/
+    #sound assets
+    - assets/custom_sound.wav
+    - assets/job_cancelled_notification.mp3
+    #svgs
+    - assets/svgs/hurryYouAreLate.svg
+    - assets/svgs/reachJobLocation.svg
+    - assets/svgs/attendanceAbsent.svg
+    - assets/svgs/whatsapp.svg
+    - assets/svgs/qrcode.svg
+    - assets/svgs/walkFaster.svg
+    - assets/svgs/cash.svg
+    - assets/svgs/redCross.svg
+    - assets/svgs/pendingVerification.svg
+    #drawer icons
+    - assets/svgs/drawer/earning.svg
+    - assets/svgs/drawer/language.svg
+    - assets/svgs/drawer/statusRank.svg
+    - assets/svgs/drawer/leaves.svg
+    - assets/svgs/drawer/training.svg
+    - assets/svgs/drawer/helpCenter.svg
+    - assets/svgs/drawer/logout.svg
+    # drawer/long-leave
+    - assets/svgs/drawer/long-leave/approved.svg
+    - assets/svgs/drawer/long-leave/pending.svg
+    - assets/svgs/drawer/long-leave/rejected.svg
+    - assets/svgs/drawer/long-leave/watch.svg
+    - assets/svgs/drawer/long-leave/underReview.svg
+    - assets/svgs/drawer/long-leave/leaveDenied.svg
+    # selfie login
+    - assets/pngs/selfie_login/
+    - assets/svgs/drawer/
+    - assets/svgs/drawer/tier-bg/
+    - assets/svgs/drawer/tier-badge/
+    - assets/svgs/drawer/tier-appbar-bg/
+    - assets/svgs/personal_details/
+    - assets/svgs/payout/
+    - assets/svgs/onboarding/
+    - assets/pngs/early_logout/
+    - assets/svgs/go_live/
+    - assets/svgs/diwali_contest/
+    - assets/pngs/diwali_contest/
+    - assets/webp/
+    - assets/kavach_opt.json
+    - shorebird.yaml
+    - assets/ml-models/
+    - assets/svgs/snabbit_shield_bg.svg
+    # - assets/svgs/30_min_icon.svg
+    # - assets/svgs/job_details_icon.svg
+    # - assets/svgs/language_translation_icon.svg
+    # - assets/svgs/notification_icon.svg
+  #   - images/a_dot_ham.jpeg
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/assets-and-images/#resolution-aware
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/assets-and-images/#from-packages
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  fonts:
+    - family: MetropolisBlack
+      fonts:
+        - asset: assets/fonts/Metropolis_Regular_Italic.ttf
+          style: italic
+          weight: 400
+        - asset: assets/fonts/Metropolis_Medium_Italic.ttf
+          style: italic
+          weight: 500
+        - asset: assets/fonts/Metropolis_Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Metropolis_Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Metropolis_Semi_Bold.ttf
+          weight: 600
+        - asset: assets/fonts/Metropolis_Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Metropolis_Extra_Bold.ttf
+          weight: 800
+        - asset: assets/fonts/Metropolis_Black.ttf
+          weight: 900
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/custom-fonts/#from-packages

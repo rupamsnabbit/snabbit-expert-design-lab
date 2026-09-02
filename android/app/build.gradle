@@ -1,0 +1,237 @@
+plugins {
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
+    id "org.jetbrains.kotlin.plugin.compose"
+
+    // Make sure this line for the Flutter plugin is present.
+    id "dev.flutter.flutter-gradle-plugin"
+    id "kotlin-android"
+    
+    // Firebase plugins for crash reporting
+    id "com.google.gms.google-services"
+    id "com.google.firebase.crashlytics"
+}
+
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+   keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+// AppsFlyer dev key — a client identifier (ships in the APK), so this is
+// config hygiene + per-environment injection, not secrecy. Resolved from
+// local.properties (local dev) → -PAPPSFLYER_DEV_KEY (CI) → env var (CI) →
+// empty. Empty/blank → the KMP analytics module skips AF registration
+// (AnalyticsConfig.isAppsFlyerEnabled), so missing key just runs AF-disabled.
+def appsFlyerDevKey = localProperties.getProperty('APPSFLYER_DEV_KEY')
+        ?: project.findProperty('APPSFLYER_DEV_KEY')
+        ?: System.getenv('APPSFLYER_DEV_KEY')
+        ?: ''
+
+// Mixpanel project token — a client identifier (ships in the APK), same
+// config-hygiene rationale as the AppsFlyer key above. Resolved from
+// local.properties → -PMIXPANEL_PROJECT_TOKEN → env var → empty. Empty/blank
+// → the KMP analytics module skips Mixpanel registration
+// (AnalyticsConfig.isMixpanelEnabled), so a missing token just runs
+// Mixpanel-disabled.
+def mixpanelProjectToken = localProperties.getProperty('MIXPANEL_PROJECT_TOKEN')
+        ?: project.findProperty('MIXPANEL_PROJECT_TOKEN')
+        ?: System.getenv('MIXPANEL_PROJECT_TOKEN')
+        ?: ''
+
+android {
+    namespace = "com.snabbit.runner"
+    compileSdkVersion 36
+    // compileSdk 34
+    ndkVersion = "28.2.13676358"
+
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId = "com.snabbit.runner"
+        // You can update the following values to match your application needs.
+        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
+        minSdkVersion 26
+        multiDexEnabled true
+        targetSdkVersion 36
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+
+        buildConfigField "String", "APPSFLYER_DEV_KEY", "\"${appsFlyerDevKey}\""
+        buildConfigField "String", "MIXPANEL_PROJECT_TOKEN", "\"${mixpanelProjectToken}\""
+    }
+
+    buildFeatures {
+        compose true
+        // Enables BuildConfig generation so SnabbitRunnerApplication can
+        // read BuildConfig.DEBUG for the AppsFlyer debug-logging toggle.
+        buildConfig true
+    }
+
+   signingConfigs {
+       release {
+           keyAlias keystoreProperties['keyAlias']
+           keyPassword keystoreProperties['keyPassword']
+           storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+           storePassword keystoreProperties['storePassword']
+       }
+   }
+
+    buildTypes {
+        release {
+
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            // Firebase Crashlytics NDK configuration
+            // Enables native crash reporting for C/C++ code (GPU drivers, etc.)
+            firebaseCrashlytics {
+                // Enable automatic upload of native debug symbols
+                nativeSymbolUploadEnabled true
+                
+                // Path to unstripped native libraries for symbolication
+                unstrippedNativeLibsDir 'build/intermediates/merged_native_libs/release/out/lib'
+            }
+
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.release
+        }
+    }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+        resources {
+            // HiveMQ MQTT client (shared, WS0 realtime) pulls in Netty, whose
+            // modules each bundle these META-INF files. Seven copies collide at
+            // mergeDebugJavaResource; drop the duplicates (pure metadata, unused
+            // at runtime).
+            excludes += ['META-INF/io.netty.versions.properties', 'META-INF/INDEX.LIST']
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    implementation project(':shared')
+
+    // Chucker — on-device HTTP inspector for the KMP/Ktor (OkHttp) network stack. Debug only;
+    // release gets the no-op artifact so nothing ships. Wired via ChuckerDebug (src/debug) into
+    // the shared engine's ApiHttpInterceptors. #chucker
+    debugImplementation 'com.github.chuckerteam.chucker:library:4.2.0'
+    releaseImplementation 'com.github.chuckerteam.chucker:library-no-op:4.2.0'
+    // Firebase Crashlytics SDK on the app compile classpath so the app can supply a
+    // Crashlytics-backed CrashReporter lambda to KmpBootstrap.initialize(...). BOM 34.9.0 matches
+    // the version already resolved via the firebase_crashlytics Flutter plugin — no version change.
+    implementation platform('com.google.firebase:firebase-bom:34.9.0')
+    implementation 'com.google.firebase:firebase-crashlytics'
+
+    // CleverTap SDK — was provided transitively by clevertap_plugin (now removed).
+    // The host uses it directly: Application base class + push (process/clicked/token).
+    implementation 'com.clevertap.android:clevertap-android-sdk:8.1.0'
+
+    // RemoteMessage / FirebaseMessagingService — compile-only because the
+    // firebase_messaging Flutter plugin already provides them at runtime; we
+    // just need compile-time visibility so SnabbitPushService can subclass.
+    // Avoids version-pinning two paths to the same SDK.
+    compileOnly 'com.google.firebase:firebase-messaging:24.0.0'
+    // Custom trace around KmpBootstrap.initialize (SnabbitRunnerApplication).
+    // compileOnly, matching the firebase-messaging line above and :shared's
+    // firebase-config: the Flutter firebase_performance plugin already bundles and
+    // initialises the SDK at runtime (firebase-perf 22.0.5 is on the runtime
+    // classpath), so we compile against the API without duplicating or bumping the
+    // host's Firebase version.
+    compileOnly 'com.google.firebase:firebase-perf'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+    implementation "com.google.android.gms:play-services-maps:18.0.0"
+    implementation 'androidx.window:window:1.0.0'
+    implementation 'androidx.window:window-java:1.0.0'
+    // installreferrer reaches :app transitively via :shared (added there
+    // alongside the AppsFlyer SDK). Don't redeclare here.
+
+    // Jetpack Compose
+    // BOM 2026.03.00 maps to Compose 1.10.5 — the same Compose runtime that
+    // Compose Multiplatform 1.10.3 (:shared module) delegates to, keeping the
+    // two Compose stacks aligned on one classpath.
+    def composeBom = platform('androidx.compose:compose-bom:2026.03.00')
+    implementation composeBom
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.compose.material:material-icons-extended'
+    implementation 'androidx.compose.ui:ui-graphics'
+    implementation 'androidx.compose.foundation:foundation'
+    implementation 'androidx.compose.runtime:runtime'
+    // Compose Multiplatform resources runtime (DrawableResource, painterResource) —
+    // :shared declares compose.components.resources as `implementation`, so it isn't
+    // exposed transitively; :app needs it directly to reference Res.drawable.* (home
+    // shell tab icons). Version pinned to the CMP 1.10.3 used by :shared (see above).
+    implementation 'org.jetbrains.compose.components:components-resources-android:1.10.3'
+    // Versions track the transitive requirements of Compose 1.10.5; the
+    // Compose BOM does not manage these androidx.activity / lifecycle /
+    // savedstate artifacts directly.
+    implementation 'androidx.activity:activity-compose:1.12.4'
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.10.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0'
+    // viewModel() for Compose — used by NativeScreens to create a VM scoped to the
+    // Nav3 NavEntry (entry-scoped, retained across A→B→back).
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0'
+    implementation 'androidx.savedstate:savedstate:1.4.0'
+
+    // Jetpack Navigation 3 now lives in :shared (commonMain) — SnabbitNavHost owns the
+    // NavDisplay/decorators/scene strategies. This module only calls the composable, so
+    // it no longer depends on any navigation3 artifact directly.
+
+    // Coil for loading consequence icon URLs in overlay
+    implementation 'io.coil-kt:coil-compose:2.7.0'
+
+    // Coroutines (aligned to shared/'s 1.11.0; Grant requires >=1.10.2 — satisfied)
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0'
+
+    //Required by Clevertap : AndroidX Media3 Libraries for Audio/Video Inbox Messages. Audio/Video messages will be dropped without these dependencies
+    implementation "androidx.media3:media3-exoplayer:1.1.1"
+    implementation "androidx.media3:media3-exoplayer-hls:1.1.1"
+    implementation "androidx.media3:media3-ui:1.1.1"
+}

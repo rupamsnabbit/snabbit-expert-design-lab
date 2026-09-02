@@ -1,0 +1,7 @@
+{
+  "event": "permissionRequest",
+  "requestId": "01JA0000PERM00000000000001",
+  "data": {
+    "status": "denied"
+  }
+}

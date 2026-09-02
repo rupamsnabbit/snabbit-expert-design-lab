@@ -1,0 +1,24 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- The INTERNET permission is required for development. Specifically,
+         the Flutter tool needs it to communicate with the running application
+         to allow setting breakpoints, to provide hot reload, etc.
+    -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <!-- Chucker (debugImplementation) declares WAKE_LOCK with android:maxSdkVersion="25"; the
+         manifest merger applies that cap to the app's WAKE_LOCK, so on API>25 the debug build loses
+         it and flutter_background_service crashes (WakeLock.acquire → SecurityException). Strip the
+         cap so WAKE_LOCK applies on all APIs. Debug-only (Chucker is debug-only). #chucker -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" tools:remove="android:maxSdkVersion" />
+
+    <application>
+        <!-- WS0 soak spike: allow adb (`am start-foreground-service`) to drive
+             the realtime service in DEBUG builds only. The service itself also
+             hard-refuses intents on non-debuggable builds. See spike/README.md. -->
+        <service
+            android:name="com.snabbit.runner.shared.core.background.SnabbitForegroundService"
+            android:exported="true"
+            tools:replace="android:exported" />
+    </application>
+</manifest>

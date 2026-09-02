@@ -1,0 +1,6 @@
+{
+  "event": "callPhone",
+  "data": {
+    "phoneNumber": "not-a-number; rm -rf /"
+  }
+}

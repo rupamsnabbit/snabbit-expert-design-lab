@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  App-owned data-extraction rules (Android 12 / API 31 and above): cloud backup +
+  device-to-device transfer. App-declared (with tools:replace) for the same reason as
+  snabbit_backup_rules.xml — Grant and AppsFlyer both ship android:dataExtractionRules and the
+  merger can't pick one. We union their exclusions plus our own permission-state prefs.
+
+  Same rationale as the full-backup file: permission "requested-before" flags and AppsFlyer
+  state must each start fresh on a new install / transfer.
+
+  FlutterSharedPreferences.xml is excluded because it is a PII carrier, not a settings file:
+  the background FCM handler caches the whole `current_state` envelope into
+  `flutter.cached_current_state` (customer name, phone, job address, hotspot lat/lng), and
+  secure_storage_service falls back to writing `flutter.access_token` there in cleartext when
+  Keystore fails. Neither may ride a cloud backup or a device-to-device transfer onto a phone
+  the runner sells, returns, or hands to a fleet operator. Cost of excluding it is that
+  benign Flutter prefs re-derive on a restored install — the right trade for customer PII.
+
+  The Tink keyset and encrypted DataStore are excluded for the same reason plus a functional
+  one: the Android Keystore master key that unwraps the keyset never leaves the device, so a
+  restored keyset is unusable and crashes the app on launch.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="grant_request_history.xml"/>
+        <exclude domain="sharedpref" path="snabbit_permissions_requested.xml"/>
+        <exclude domain="sharedpref" path="appsflyer-data"/>
+        <exclude domain="sharedpref" path="appsflyer-purchase-data"/>
+        <exclude domain="sharedpref" path="FlutterSharedPreferences.xml"/>
+        <exclude domain="sharedpref" path="snabbit_runner_kmp_keyset_prefs.xml"/>
+        <exclude domain="file" path="datastore/snabbit_runner_encrypted_store.preferences_pb"/>
+        <exclude domain="database" path="afpurchases.db"/>
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="grant_request_history.xml"/>
+        <exclude domain="sharedpref" path="snabbit_permissions_requested.xml"/>
+        <exclude domain="sharedpref" path="appsflyer-data"/>
+        <exclude domain="sharedpref" path="appsflyer-purchase-data"/>
+        <exclude domain="sharedpref" path="FlutterSharedPreferences.xml"/>
+        <exclude domain="sharedpref" path="snabbit_runner_kmp_keyset_prefs.xml"/>
+        <exclude domain="file" path="datastore/snabbit_runner_encrypted_store.preferences_pb"/>
+        <exclude domain="database" path="afpurchases.db"/>
+    </device-transfer>
+</data-extraction-rules>

@@ -1,0 +1,43 @@
+{
+  "skill": "review-changes",
+  "evals": [
+    {
+      "name": "trigger-pre-pr",
+      "category": "trigger-positive",
+      "prompt": "Review my changes before I push.",
+      "assertions": [
+        "The review-changes skill is loaded",
+        "Identifies changed files in shared/src/commonMain and commonTest"
+      ]
+    },
+    {
+      "name": "trigger-review-branch",
+      "category": "trigger-positive",
+      "prompt": "Code review this KMP shared-module branch.",
+      "assertions": [
+        "The review-changes skill is loaded",
+        "Fans out to the architecture, concurrency, and ui specialist agents in parallel"
+      ]
+    },
+    {
+      "name": "trigger-negative-build",
+      "category": "trigger-negative",
+      "prompt": "Build a new profile feature in the shared module.",
+      "assertions": [
+        "The review-changes skill is NOT loaded",
+        "Routed to the build-feature skill instead"
+      ]
+    },
+    {
+      "name": "functional-catch-scope-injection",
+      "category": "functional",
+      "prompt": "Review a diff whose ViewModel injects a CoroutineScope and updates state with _uiState.value = instead of update{}.",
+      "assertions": [
+        "concurrency-reviewer flags the injected CoroutineScope (must use viewModelScope)",
+        "concurrency-reviewer flags _uiState.value = (must use update{})",
+        "Aggregate verdict is FAIL with file:line + exact fix per finding",
+        "Review is not marked complete while any FAIL item is open"
+      ]
+    }
+  ]
+}

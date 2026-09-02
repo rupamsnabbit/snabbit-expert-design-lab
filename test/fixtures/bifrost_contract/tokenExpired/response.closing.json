@@ -1,0 +1,7 @@
+{
+  "event": "tokenExpired",
+  "requestId": "01J9Z3TKX0V20000000000000T1",
+  "data": {
+    "closing": true
+  }
+}

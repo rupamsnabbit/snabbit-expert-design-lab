@@ -1,0 +1,6 @@
+{
+  "event": "trackEvent",
+  "data": {
+    "name": "app_opened"
+  }
+}

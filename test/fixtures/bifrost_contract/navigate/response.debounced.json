@@ -1,0 +1,8 @@
+{
+  "event": "navigate",
+  "requestId": "01J9Z3NAV8Q0000000000000V4",
+  "error": {
+    "code": "DEBOUNCED",
+    "message": "Ignored navigation within debounce window"
+  }
+}

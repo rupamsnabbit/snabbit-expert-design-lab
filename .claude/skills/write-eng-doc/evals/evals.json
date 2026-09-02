@@ -1,0 +1,52 @@
+{
+  "skill": "write-eng-doc",
+  "evals": [
+    {
+      "name": "trigger-write-hld",
+      "category": "trigger-positive",
+      "prompt": "Write an HLD for a push-notification feature in the shared module.",
+      "assertions": [
+        "The write-eng-doc skill is loaded",
+        "Uses the assets/HLD.md section structure",
+        "Asks for missing feature details rather than inventing them"
+      ]
+    },
+    {
+      "name": "trigger-draft-prd",
+      "category": "trigger-positive",
+      "prompt": "Draft a PRD for a runner referral feature.",
+      "assertions": [
+        "The write-eng-doc skill is loaded",
+        "Scopes output to what/why only, no implementation detail"
+      ]
+    },
+    {
+      "name": "trigger-negative-build",
+      "category": "trigger-negative",
+      "prompt": "Build the referral feature in the shared module.",
+      "assertions": [
+        "The write-eng-doc skill is NOT loaded",
+        "Routed to the build-feature skill (writing docs is not building the feature)"
+      ]
+    },
+    {
+      "name": "functional-trd-offline-sync",
+      "category": "functional",
+      "prompt": "Create a TRD for offline order sync in the shared module (Android + iOS). Backend endpoints and SLAs are unknown.",
+      "assertions": [
+        "Output follows assets/TRD.md headings exactly, no added sections",
+        "Has YAML front-matter with doc_type TRD, platforms [android, ios], and traceability",
+        "Functional requirements trace to a PRD id",
+        "Non-functional requirements are quantified with number and unit",
+        "Unknown backend endpoints and SLAs are marked [TBD], not fabricated",
+        "Structured sections (Permissions, Architecture, Data, Dependencies) are tables, not free-text",
+        "Contains at least one Mermaid diagram for a non-trivial flow, topology, state, or architecture",
+        "Errors are modeled as AppErrorType (per core-facts.md), not a generic error type",
+        "Cites .claude/documents/* (e.g. feature-template.md, core-facts.md) rather than restating their rules",
+        "Per-platform content is Android/iOS only (no Flutter/RN columns)",
+        "Written in plain human-readable sentences, no source code",
+        "Any current-fact claim (API/version/OS limit) not in the recorded docs is web-searched and cited or marked [ASSUMPTION]"
+      ]
+    }
+  ]
+}

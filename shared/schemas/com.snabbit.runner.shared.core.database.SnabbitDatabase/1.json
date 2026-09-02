@@ -1,0 +1,61 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "475b3955d258792648c007bfc999b562",
+    "entities": [
+      {
+        "tableName": "runner_home_state",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`runnerId` INTEGER NOT NULL, `epoch` INTEGER NOT NULL, `stateSeq` INTEGER NOT NULL, `widgetJson` TEXT NOT NULL, `updatedAtMs` INTEGER NOT NULL, `source` TEXT NOT NULL, PRIMARY KEY(`runnerId`))",
+        "fields": [
+          {
+            "fieldPath": "runnerId",
+            "columnName": "runnerId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "epoch",
+            "columnName": "epoch",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stateSeq",
+            "columnName": "stateSeq",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "widgetJson",
+            "columnName": "widgetJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAtMs",
+            "columnName": "updatedAtMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "runnerId"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '475b3955d258792648c007bfc999b562')"
+    ]
+  }
+}
