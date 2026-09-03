@@ -8,6 +8,8 @@ For any PRD, Figma, screenshot, UI/UX critique, new or redesigned screen, compon
 
 Also use `.agents/skills/impeccable/SKILL.md` when the task asks to improve visual quality, hierarchy, layout, typography, color, motion, responsiveness, accessibility, UX copy, state completeness, critique, audit, or polish. Impeccable is a craft and QA lens; it does not override Snabbit product truth or the source order below.
 
+When the user asks to explore designs, find inspiration, compare how other products solve a flow, or resolve an unfamiliar interaction pattern, use the connected `mobbin` MCP server and follow `docs/design/REFERENCE_RESEARCH.md`. Mobbin is research evidence, not a visual source of truth: extract transferable product and interaction lessons, record them in the design brief, and translate them through Snabbit tokens, components, voice, states, and Android constraints. Never copy a Mobbin screen verbatim.
+
 Keep routine engineering questions outside that workflow unless they materially affect the interface.
 
 ## Working boundaries
@@ -30,3 +32,5 @@ When visual sources disagree, use:
 4. A documented local decision only when the first three cannot express the requirement.
 
 PRDs and Figma define the intended user outcome. They do not silently create new tokens or interaction patterns.
+
+Mobbin and other external references sit below this order. They can inform which problem-solving pattern to consider, but cannot override an approved Snabbit rule.

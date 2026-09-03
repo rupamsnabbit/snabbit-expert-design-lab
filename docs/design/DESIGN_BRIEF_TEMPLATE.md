@@ -28,12 +28,12 @@ Use this lightweight brief for a new screen or meaningful redesign. Save an appr
 
 ## Reference synthesis
 
-| Reference | Pattern worth adapting | Why it fits this user moment | What not to copy |
-| --- | --- | --- | --- |
-| Snabbit |  |  |  |
-| External, if used |  |  |  |
+| Reference | Observed pattern | Evidence / why it fits | Snabbit adaptation | What not to copy |
+| --- | --- | --- | --- | --- |
+| Snabbit |  |  |  |  |
+| Mobbin / external, if used |  |  |  |  |
 
-External references inform the solution; Snabbit tokens and patterns determine its visual expression.
+External references inform the solution; Snabbit tokens and patterns determine its visual expression. Link or name the exact screen/flow reviewed. Distinguish an observation from a recommendation, and follow [REFERENCE_RESEARCH.md](./REFERENCE_RESEARCH.md).
 
 ## Proposed experience
 

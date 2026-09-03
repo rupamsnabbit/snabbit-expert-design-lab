@@ -39,7 +39,9 @@ Do not enable hooks, introduce a new visual world, create `DESIGN.md`, or run an
 1. Read the PRD/prompt and inspect every supplied Figma frame or reference that affects the task. If a Figma link is available, use the available Figma workflow rather than guessing from its title.
 2. Identify the user moment, primary outcome, consequence of delay/failure, and any missing product decision. Ask only questions whose answers would materially change the result.
 3. Inspect the current screen, its actual reusable components, and the closest reference family in `docs/design/GOLDEN_REFERENCES.md`.
-4. External product research may inform information architecture, interaction, or state handling when the user requests it or it would resolve a real uncertainty. Record what was learned and why it applies. Do not copy another product's branding or treat external visuals as Snabbit's source of truth.
+4. When the user asks to explore designs, requests inspiration or benchmarking, or a real interaction uncertainty remains, use the connected `mobbin` MCP server and follow `docs/design/REFERENCE_RESEARCH.md`. Search for the specific user moment rather than browsing broadly.
+5. Record the useful behavior, hierarchy, state, and content lessons in the design brief. Separate observations from recommendations and identify what will change during translation to Snabbit.
+6. Do not copy another product's branding, assets, copy, or full composition, and do not treat external visuals as Snabbit's source of truth.
 
 ## Load design context selectively
 
@@ -52,6 +54,7 @@ Start with `docs/design/AI_DESIGN_INSTRUCTIONS.md`; it is the router. Then read 
 | Reusing or changing a component | Relevant entry in `COMPONENT_LIBRARY.md` |
 | Screen structure, sheets, states, navigation, CTAs | Relevant section of `SCREEN_PATTERNS.md` |
 | Existing screen/route/reference | Relevant rows in `SCREEN_INVENTORY.md` and `GOLDEN_REFERENCES.md` |
+| External pattern exploration | `REFERENCE_RESEARCH.md` and the `Reference synthesis` section of the design brief |
 | Reviewable data and states | `FRONTEND_FIXTURES.md` |
 | User-facing copy | Relevant section of `CONTENT_AND_VOICE.md` |
 | No existing component fits | `DESIGN_EXTENSION_PROCESS.md` and, when required, `NEW_COMPONENT_BRIEF_TEMPLATE.md` |

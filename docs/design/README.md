@@ -6,6 +6,8 @@ Start with [AI design instructions](./AI_DESIGN_INSTRUCTIONS.md) for the require
 
 The repository also includes the `snabbit-design` workflow and [Impeccable](https://github.com/pbakaus/impeccable) v4.1.3 (Apache-2.0) under `.agents/skills/`. Impeccable strengthens critique and polish; the Snabbit source-of-truth order still decides the product's visual language.
 
+Mobbin is connected as an MCP research source for focused pattern exploration. Follow [Reference research](./REFERENCE_RESEARCH.md): learn from behavior and information architecture, then translate the insight into Snabbit rather than copying an external screen.
+
 ## Core documents
 
 - [Design principles](./DESIGN_PRINCIPLES.md) — the bright, warm, confident, practical, trustworthy, and human product personality.
@@ -18,6 +20,7 @@ The repository also includes the `snabbit-design` workflow and [Impeccable](http
 - [Design QA checklist](./DESIGN_QA_CHECKLIST.md) — final design and implementation review gate.
 - [Design-system extension process](./DESIGN_EXTENSION_PROCESS.md) — how to build a compatible local composition, variant, or new component when the system has no exact match.
 - [Golden reference families](./GOLDEN_REFERENCES.md) — preferred Home, job, attendance, sheet, payout, and outcome references, with cautions and evidence status.
+- [Reference research](./REFERENCE_RESEARCH.md) — when and how to use Mobbin or other external examples without drifting from Snabbit.
 - [Expert App design framework](./EXPERT_APP_DESIGN_FRAMEWORK.md) — end-to-end design workflow and definition of done.
 - [Screen / experience design brief](./DESIGN_BRIEF_TEMPLATE.md) — lightweight approval brief for a new screen or meaningful redesign.
 - [New component brief](./NEW_COMPONENT_BRIEF_TEMPLATE.md) — copy this before proposing a new component or screen pattern.

@@ -18,6 +18,7 @@ PRDs and approved Figma define the intended outcome. They do not silently author
 | Task | Minimum design context |
 | --- | --- |
 | Critique or improve an existing design | [DESIGN_PRINCIPLES.md](./DESIGN_PRINCIPLES.md), nearest golden reference, relevant screen pattern, and current implementation/Figma |
+| Explore patterns or benchmark other products | [REFERENCE_RESEARCH.md](./REFERENCE_RESEARCH.md), then the relevant Snabbit pattern, component, token, and voice rules |
 | New screen from a PRD | [DESIGN_BRIEF_TEMPLATE.md](./DESIGN_BRIEF_TEMPLATE.md), relevant principles, pattern, inventory rows, components, tokens, fixtures, and voice |
 | Small visual correction | Owning component/screen plus the exact token or component rule involved |
 | New or changed reusable component | Relevant component entry and [DESIGN_EXTENSION_PROCESS.md](./DESIGN_EXTENSION_PROCESS.md) |
@@ -36,6 +37,12 @@ For a new screen or meaningful redesign:
 4. After approval, implement with frontend fixtures and provide a directly reviewable entry point.
 
 A small, explicit correction does not need a stored brief unless it introduces a new reusable decision.
+
+## External design exploration
+
+When the user asks to explore designs, find inspiration, benchmark a flow, or understand how other products solve a problem, use the connected `mobbin` MCP server and follow [REFERENCE_RESEARCH.md](./REFERENCE_RESEARCH.md). Use Mobbin to study a specific user moment and extract product patterns; do not use it to select a new visual style.
+
+Put the synthesis in the design brief before implementation. Every recommendation must state how the reference is being adapted to Snabbit's user, operational context, components, tokens, voice, states, and Android constraints. If Mobbin is unavailable or unauthorized, report that limitation and do not invent research findings.
 
 ## Frontend-only boundary
 
