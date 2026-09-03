@@ -6,6 +6,8 @@ This repository is used by a product designer to explore, review, and implement 
 
 For any PRD, Figma, screenshot, UI/UX critique, new or redesigned screen, component, visual state, frontend prototype, or design QA task, use the repository skill at `.agents/skills/snabbit-design/SKILL.md`.
 
+Also use `.agents/skills/impeccable/SKILL.md` when the task asks to improve visual quality, hierarchy, layout, typography, color, motion, responsiveness, accessibility, UX copy, state completeness, critique, audit, or polish. Impeccable is a craft and QA lens; it does not override Snabbit product truth or the source order below.
+
 Keep routine engineering questions outside that workflow unless they materially affect the interface.
 
 ## Working boundaries

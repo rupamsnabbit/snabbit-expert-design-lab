@@ -4,6 +4,8 @@ This folder is the frontend and product-design source of truth for new work in t
 
 Start with [AI design instructions](./AI_DESIGN_INSTRUCTIONS.md) for the required reading order and implementation workflow.
 
+The repository also includes the `snabbit-design` workflow and [Impeccable](https://github.com/pbakaus/impeccable) v4.1.3 (Apache-2.0) under `.agents/skills/`. Impeccable strengthens critique and polish; the Snabbit source-of-truth order still decides the product's visual language.
+
 ## Core documents
 
 - [Design principles](./DESIGN_PRINCIPLES.md) — the bright, warm, confident, practical, trustworthy, and human product personality.

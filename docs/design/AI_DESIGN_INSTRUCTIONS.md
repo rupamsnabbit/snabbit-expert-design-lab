@@ -48,6 +48,12 @@ A small, explicit correction does not need a stored brief unless it introduces a
 
 Reuse existing components and semantic tokens wherever they fit. If nothing fits, follow [DESIGN_EXTENSION_PROCESS.md](./DESIGN_EXTENSION_PROCESS.md): try composition first, identify the missing capability, choose the narrowest ownership level, document meaningful extensions, and keep them experimental until validated.
 
+## Visual craft lens
+
+Use the repository's `impeccable` skill for critique, hierarchy, layout, typography, responsive behavior, accessibility, state completeness, and final polish. The Expert App is an operational product: clarity, trust, consistency, and task completion outrank decorative novelty.
+
+Impeccable suggestions sit below the design-system package, these documents, and approved Snabbit references. If a generic anti-pattern rule conflicts with an intentional documented product decision, preserve the product decision and record only genuine exceptions or extensions.
+
 ## Required state thinking
 
 Design the applicable default, loading, empty, success, error, disabled, offline/permission, timeout/expiry, and long-content states. Make the current state, next action, and any time, money, safety, or destructive consequence clear. Use [FRONTEND_FIXTURES.md](./FRONTEND_FIXTURES.md) for deterministic review data.

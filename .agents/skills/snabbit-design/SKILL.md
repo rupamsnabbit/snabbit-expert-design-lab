@@ -14,6 +14,26 @@ Create a coherent Snabbit experience, not a standalone mockup. Explain decisions
 - **Small visual change:** inspect the owning screen and relevant rules, state the intended correction, implement it, and verify proportionately.
 - **Implementation of an approved direction:** use frontend fixtures, preserve the owning framework, render the meaningful states, and complete design QA.
 
+## Use Impeccable for visual craft
+
+Load `.agents/skills/impeccable/SKILL.md` alongside this skill for visual design work. Treat the Expert App as Impeccable **Operate** mode: the expert completing the task, understanding the current state, and acting safely outrank novelty.
+
+Run Impeccable's context setup once per applicable task. If `node` is not on `PATH`, use the bundled Node executable reported by the workspace dependency runtime; do not install another Node version merely to run the skill.
+
+Use Impeccable selectively:
+
+| Snabbit task | Impeccable lens |
+| --- | --- |
+| Explore a PRD or shape a new flow | `shape` / new-work guidance after product context is established |
+| Improve or review an existing Figma/screen | `critique` for prioritized, evidence-based findings |
+| Refine hierarchy, spacing, type, or density | `layout`, `typeset`, `distill`, `bolder`, or `quieter` as appropriate |
+| Complete edge cases and accessibility | `harden` and native `adapt` / `audit` guidance |
+| Final implementation pass | `polish`, followed by one bounded confirmation pass |
+
+The authority order is: approved product outcome and facts, Snabbit design-system package, `docs/design/`, consistent Snabbit references, then Impeccable craft guidance. Treat generic detector findings as evidence to evaluate, not automatic permission to change a deliberate Snabbit token or pattern. Document a true new decision through the Snabbit extension process.
+
+Do not enable hooks, introduce a new visual world, create `DESIGN.md`, or run an Impeccable redesign flow as a side effect. Do those only when the current request needs them. Keep visual QA bounded to an initial batched review, one correction batch, and at most one confirmation pass.
+
 ## Discover before deciding
 
 1. Read the PRD/prompt and inspect every supplied Figma frame or reference that affects the task. If a Figma link is available, use the available Figma workflow rather than guessing from its title.
